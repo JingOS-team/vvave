@@ -1,3 +1,19 @@
+/*
+   Babe - tiny music player
+   Copyright 2021 Wang Rui <wangrui@jingos.com>
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+   */
+
 import QtQuick 2.10
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.10
@@ -17,31 +33,17 @@ Maui.ListBrowserDelegate
     property bool number : false
     property bool coverArt : false
 
-    readonly property color moodColor : model.color
     readonly property string artist : model.artist
     readonly property string album : model.album
     readonly property string title : model.title
     readonly property url url : model.url
     readonly property int rate : model.rate
     readonly property int track : model.track
-    readonly property string artwork : model.artwork
 
     property bool sameAlbum : false
 
-    signal play()
-    signal append()
-    signal leftClicked()
-
-    signal artworkCoverClicked()
-    signal artworkCoverDoubleClicked()
-
-    Kirigami.Theme.backgroundColor: model.color && String(model.color).length > 0 ? model.color : "transparent"
-
     isCurrentItem: ListView.isCurrentItem || checked
-    padding: 0
 
-    rightPadding: leftPadding
-    leftPadding: Maui.Style.space.small
     draggable: true
 
     iconSizeHint: height - Maui.Style.space.small
@@ -49,13 +51,11 @@ Maui.ListBrowserDelegate
     label2.text: control.artist + " | " + control.album
     label2.visible: control.coverArt ? !control.sameAlbum : true
 
-    label4.font.family: "Material Design Icons"
-    label4.text: control.rate ? H.setStars(control.rate) : ""
-
-    label3.text: ""
+    label3.font.family: "Material Design Icons"
+    label3.text: control.rate ? H.setStars(control.rate) : ""
 
     iconVisible: !control.sameAlbum && control.coverArt
-    imageSource: control.artwork ? control.artwork : "qrc:/assets/cover.png"
+    imageSource: coverArt ? "image://artwork/album:"+ control.artist+":"+control.album : ""
+    template.leftMargin: iconVisible ? 0 : Maui.Style.space.medium
 
-//    onToggled: control.toggled(index, state)
 }

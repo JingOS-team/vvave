@@ -34,7 +34,7 @@ youtubedl::youtubedl(QObject *parent) : QObject(parent)
 #endif
 }
 
-youtubedl::~youtubedl(){}
+youtubedl::~youtubedl() {}
 
 void youtubedl::fetch(const QString &json)
 {
@@ -64,7 +64,7 @@ void youtubedl::fetch(const QString &json)
     infoMap.insert(FMH::MODEL_KEY::ID, id);
     infoMap.insert(FMH::MODEL_KEY::PLAYLIST, playlist);
 
-    if(!this->ids.contains(infoMap[FMH::MODEL_KEY::ID]))
+    if (!this->ids.contains(infoMap[FMH::MODEL_KEY::ID]))
     {
         this->ids << infoMap[FMH::MODEL_KEY::ID];
 

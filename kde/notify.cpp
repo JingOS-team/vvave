@@ -12,7 +12,7 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
+   
    */
 
 #include "notify.h"
@@ -46,10 +46,10 @@ void Notify::notifySong(const FMH::MODEL &trackMap)
     notification->setText(QStringLiteral("%1\n%2").arg(track[FMH::MODEL_KEY::ARTIST],track[FMH::MODEL_KEY::ALBUM]));
     QPixmap pixmap;
     pixmap.load(trackMap[FMH::MODEL_KEY::ARTWORK]);
-    if(!pixmap.isNull()) notification->setPixmap(pixmap);
+    if (!pixmap.isNull()) notification->setPixmap(pixmap);
     QStringList actions;
 
-    if(track[FMH::MODEL_KEY::FAV].toInt()==1) actions<<i18n("Un-Babe it  \xe2\x99\xa1");
+    if (track[FMH::MODEL_KEY::FAV].toInt()==1) actions<<i18n("Un-Babe it  \xe2\x99\xa1");
     else actions<<i18n("Babe it  \xe2\x99\xa1");
 
     actions<<i18n("Skip");
@@ -62,10 +62,15 @@ void Notify::notifySong(const FMH::MODEL &trackMap)
 
 void Notify::actions(uint id)
 {
-    switch(id)
+    switch (id)
     {
-        case 1: emit this->babeSong(); break;
-        case 2: emit this->skipSong(); break;
-        default: break;
+    case 1:
+        emit this->babeSong();
+        break;
+    case 2:
+        emit this->skipSong();
+        break;
+    default:
+        break;
     }
 }

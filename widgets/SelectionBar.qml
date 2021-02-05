@@ -1,3 +1,19 @@
+/*
+   Babe - tiny music player
+   Copyright 2021 Wang Rui <wangrui@jingos.com>
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+   */
+
 import QtQuick 2.0
 import QtQuick 2.10
 import QtQuick.Controls 2.10
@@ -29,7 +45,7 @@ MauiLab.SelectionBar
     {
         isCurrentItem: false
         Kirigami.Theme.inherit: true
-        width: parent.width
+        width: 100
         number: false
         coverArt: true
         showQuickActions: false
@@ -45,7 +61,7 @@ MauiLab.SelectionBar
         icon.name: "media-playlist-play"
         onTriggered:
         {
-            mainPlaylist.list.clear()
+            mainPlaylist.listModel.list.clear()
             Player.playAll(control.items)
         }
     }
@@ -66,21 +82,6 @@ MauiLab.SelectionBar
             Player.queueTracks(control.items)
         }
     }
-
-//    MenuSeparator {}
-
-
-//    MenuItem
-//    {
-//        text: qsTr("Fav/UnFav them")
-//        onTriggered:
-//        {
-//            for(var i= 0; i < _selectionBar.count; i++)
-//                _selectionBarModelList.fav(i, !(_selectionBarModelList.get(i).fav == "1"))
-
-//        }
-//    }
-
 
     Action
     {
@@ -121,109 +122,4 @@ MauiLab.SelectionBar
         }
     }
 
-//    MenuSeparator {}
-
-//    MenuItem
-//    {
-//        id: starsRow
-//        width: parent.width
-//        height: Maui.Style.iconSizes.medium + Maui.Style.space.small
-
-//        RowLayout
-//        {
-//            anchors.fill: parent
-
-//            ToolButton
-//            {
-//                Layout.fillWidth: true
-//                Layout.fillHeight: true
-//                icon.name: starIcon
-//                icon.width: Maui.Style.iconSizes.medium
-//                icon.color: rate >= 1 ? starColor :starReg
-//                onClicked:
-//                {
-//                    rate = 1
-//                }
-//            }
-
-//            ToolButton
-//            {
-//                Layout.fillWidth: true
-//                Layout.fillHeight: true
-//                icon.width: Maui.Style.iconSizes.medium
-//                icon.name: starIcon
-//                icon.color: rate >= 2 ? starColor :starReg
-//                onClicked:
-//                {
-//                    rate = 2
-//                }
-//            }
-
-//            ToolButton
-//            {
-//                Layout.fillWidth: true
-//                Layout.fillHeight: true
-//                icon.width: Maui.Style.iconSizes.medium
-//                icon.name: starIcon
-//                icon.color: rate >= 3 ? starColor :starReg
-//                onClicked:
-//                {
-//                    rate = 3
-//                }
-//            }
-
-//            ToolButton
-//            {
-//                Layout.fillWidth: true
-//                Layout.fillHeight: true
-//                icon.width: Maui.Style.iconSizes.medium
-//                icon.name: starIcon
-//                icon.color: rate >= 4 ? starColor :starReg
-//                onClicked:
-//                {
-//                    rate = 4
-//                }
-//            }
-
-//            ToolButton
-//            {
-//                Layout.fillWidth: true
-//                Layout.fillHeight: true
-//                icon.width: Maui.Style.iconSizes.medium
-//                icon.name: starIcon
-//                icon.color: rate >= 5 ? starColor :starReg
-//                onClicked:
-//                {
-//                    rate = 5
-//                }
-//            }
-//        }
-//    }
-
-//    onRateChanged:
-//    {
-//        close()
-//        for(var i= 0; i < _selectionBar.count; i++)
-//            _selectionBarModelList.rate(i, control.rate)
-
-
-//    }
-
-//    MenuItem
-//    {
-//        id: colorsRow
-//        width: parent.width
-//        height:  Maui.Style.iconSizes.medium + Maui.Style.space.small
-
-//        ColorTagsBar
-//        {
-//            anchors.fill: parent
-//            onColorClicked:
-//            {
-//                for(var i= 0; i < _selectionBar.count; i++)
-//                    _selectionBarModelList.color(i, color)
-//                control.close()
-//            }
-//        }
-//    }
 }

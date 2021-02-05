@@ -1,3 +1,19 @@
+/*
+   Babe - tiny music player
+   Copyright 2021 Wang Rui <wangrui@jingos.com>
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+   */
+
 #include "vvave.h"
 
 #include "db/collectionDB.h"
@@ -26,18 +42,6 @@
 vvave::vvave(QObject *parent) : QObject(parent),
     db(CollectionDB::getInstance())
 {
-    for(const auto &path : {BAE::CachePath, BAE::YoutubeCachePath})
-    {
-        QDir dirPath(path);
-        if (!dirPath.exists())
-            dirPath.mkpath(".");
-    }
-
-//#if (defined (Q_OS_LINUX) && !defined (Q_OS_ANDROID))
-//    if(!FMH::fileExists(BAE::NotifyDir+"/vvave.notifyrc"))
-//        QFile::copy(":/assets/vvave.notifyrc", BAE::NotifyDir+"/vvave.notifyrc");
-
-//#endif
 }
 
 //// PUBLIC SLOTS
@@ -45,21 +49,21 @@ QVariantList vvave::sourceFolders()
 {
     const auto sources = CollectionDB::getInstance()->getDBData("select * from sources");
     QVariantList res;
-    for(const auto &item : sources)
+    for (const auto &item : sources)
         res << FMH::getDirInfo(item[FMH::MODEL_KEY::URL]);
     return res;
 }
 
 bool vvave::removeSource(const QString &source)
 {
-    if(!this->getSourceFolders().contains(source))
+    if (!this->getSourceFolders().contains(source))
         return false;
     return this->db->removeSource(source);
 }
 
 QString vvave::moodColor(const int &index)
 {
-    if(index < BAE::MoodColors.size() && index > -1)
+    if (index < BAE::MoodColors.size() && index > -1)
         return BAE::MoodColors.at(index);
     else return "";
 }
@@ -69,46 +73,46 @@ QStringList vvave::moodColors()
     return BAE::MoodColors;
 }
 
-void vvave::scanDir(const QStringList &paths)
+void vvave::scanDir(const QStringList &paths)//hjy 启动时候会走这个方法
 {
     QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>;
     connect(watcher, &QFutureWatcher<uint>::finished, [&, watcher]()
     {
-        qDebug()<< "FINISHED SCANING CXOLLECTION";
         emit this->refreshTables( watcher->future().result());
         watcher->deleteLater();
     });
 
     const auto func = [=]() -> uint
     {
-        return FLoader::getTracks(QUrl::fromStringList(paths));
+        FLoader::getVideos(QUrl::fromStringList(paths), this);
+        return FLoader::getTracks(QUrl::fromStringList(paths), this);
     };
 
     QFuture<uint> t1 = QtConcurrent::run(func);
     watcher->setFuture(t1);
 }
 
- QStringList vvave::getSourceFolders()
+QStringList vvave::getSourceFolders()
 {
     return CollectionDB::getInstance()-> getSourcesFolders();
 }
 
 void vvave::openUrls(const QStringList &urls)
 {
-    if(urls.isEmpty()) return;
+    if (urls.isEmpty()) return;
 
     QVariantList data;
 
-    for(const auto &url : urls)
-      {
+    for (const auto &url : urls)
+    {
         auto _url = QUrl::fromUserInput(url);
-        if(db->check_existance(BAE::TABLEMAP[BAE::TABLE::TRACKS], FMH::MODEL_NAME[FMH::MODEL_KEY::URL], _url.toString()))
+        if (db->check_existance(BAE::TABLEMAP[BAE::TABLE::TRACKS], FMH::MODEL_NAME[FMH::MODEL_KEY::URL], _url.toString()))
         {
             data << FMH::toMap(this->db->getDBData(QStringList() << _url.toString()).first());
-        }else
+        } else
         {
             TagInfo info(_url.toLocalFile());
-            if(!info.isNull())
+            if (!info.isNull())
             {
                 const auto album = BAE::fixString(info.getAlbum());
                 const auto track= info.getTrack();
@@ -120,20 +124,21 @@ void vvave::openUrls(const QStringList &urls)
                 const auto year = info.getYear();
 
                 data << QVariantMap({
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::URL], _url.toString()},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::TRACK], QString::number(track)},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::TITLE], title},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::ARTIST], artist},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::ALBUM], album},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::DURATION],QString::number(duration)},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::GENRE], genre},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::SOURCE], sourceUrl},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::FAV],"0"},
-                                        {FMH::MODEL_NAME[FMH::MODEL_KEY::RELEASEDATE], QString::number(year)}
-                                    });
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::URL], _url.toString()},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::TRACK], QString::number(track)},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::TITLE], title},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::ARTIST], artist},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::ALBUM], album},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::DURATION],QString::number(duration)},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::GENRE], genre},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::SOURCE], sourceUrl},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::FAV],"0"},
+                    {FMH::MODEL_NAME[FMH::MODEL_KEY::RELEASEDATE], QString::number(year)}
+
+                });
             }
         }
-      }
+    }
 
     emit this->openFiles(data);
 }

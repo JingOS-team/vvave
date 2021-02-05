@@ -15,7 +15,7 @@ TEMPLATE = app
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 1
-VERSION_BUILD = 1
+VERSION_BUILD = 0
 
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 DEFINES += VVAVE_VERSION_STRING=\\\"$$VERSION\\\"
@@ -99,6 +99,7 @@ SOURCES += main.cpp \
     services/web/youtube.cpp \
     vvave.cpp \
     models/tracks/tracksmodel.cpp \
+    models/videos/videosmodel.cpp \
     models/playlists/playlistsmodel.cpp \
     models/albums/albumsmodel.cpp \
     services/web/NextCloud/nextmusic.cpp \
@@ -122,6 +123,7 @@ HEADERS += \
     services/web/youtube.h \
     vvave.h \
     models/tracks/tracksmodel.h \
+    models/videos/videosmodel.h \
     models/playlists/playlistsmodel.h \
     models/albums/albumsmodel.h \
     services/web/NextCloud/nextmusic.h \

@@ -74,7 +74,7 @@ BabeList
         id: delegate
         width: control.width
         label: model.playlist
-
+        
         Connections
         {
             target : delegate
@@ -125,7 +125,7 @@ BabeList
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         color: Kirigami.Theme.backgroundColor
-
+        
         ColumnLayout
         {
            anchors.fill: parent
@@ -185,7 +185,7 @@ BabeList
                             switch(currentPlaylist)
                             {
                             case "Most Played":
-
+                            
                                 populate(Q.GET.mostPlayedTracks, false);
                                 filterList.list.sortBy = Tracks.COUNT
                                 break;

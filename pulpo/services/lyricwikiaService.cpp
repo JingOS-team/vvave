@@ -24,29 +24,30 @@ bool lyricWikia::setUpService(const PULPO::ONTOLOGY &ontology, const PULPO::INFO
     this->ontology = ontology;
     this->info = info;
 
-    if(!this->availableInfo[this->ontology].contains(this->info))
+    if (!this->availableInfo[this->ontology].contains(this->info))
         return false;
 
     auto url = this->API;
 
-    switch(this->ontology)
+    switch (this->ontology)
     {
-        case PULPO::ONTOLOGY::TRACK:
-        {
-            QUrl encodedArtist(this->track[FMH::MODEL_KEY::ARTIST]);
-            encodedArtist.toEncoded(QUrl::FullyEncoded);
+    case PULPO::ONTOLOGY::TRACK:
+    {
+        QUrl encodedArtist(this->track[FMH::MODEL_KEY::ARTIST]);
+        encodedArtist.toEncoded(QUrl::FullyEncoded);
 
-            QUrl encodedTrack(this->track[FMH::MODEL_KEY::TITLE]);
-            encodedTrack.toEncoded(QUrl::FullyEncoded);
+        QUrl encodedTrack(this->track[FMH::MODEL_KEY::TITLE]);
+        encodedTrack.toEncoded(QUrl::FullyEncoded);
 
-            url.append("&artist=" + encodedArtist.toString());
-            url.append("&song=" + encodedTrack.toString());
-            url.append("&fmt=xml");
+        url.append("&artist=" + encodedArtist.toString());
+        url.append("&song=" + encodedTrack.toString());
+        url.append("&fmt=xml");
 
-            break;
-        }
+        break;
+    }
 
-        default: return false;
+    default:
+        return false;
     }
 
     qDebug()<< "[lyricwikia service]: "<< url;
@@ -82,7 +83,7 @@ bool lyricWikia::parseTrack()
     {
         qDebug() << "Receiving lyrics" << data;
 
-        if(data.isEmpty())
+        if (data.isEmpty())
             return;
 
         this->extractLyrics(data);
@@ -102,14 +103,14 @@ bool lyricWikia::extractLyrics(const QByteArray &array)
     lyrics_regexp.indexIn(content);
     QString lyrics = lyrics_regexp.cap(1);
 
-    if(lyrics.isEmpty()) return false;
+    if (lyrics.isEmpty()) return false;
 
     lyrics = lyrics.trimmed();
     lyrics.replace("\n", "<br>");
 
     QString text;
 
-    if(!lyrics.contains("PUT LYRICS HERE")&&!lyrics.isEmpty())
+    if (!lyrics.contains("PUT LYRICS HERE")&&!lyrics.isEmpty())
     {
         text = "<h2 align='center' >" + this->track[FMH::MODEL_KEY::TITLE] + "</h2>";
         text += lyrics;

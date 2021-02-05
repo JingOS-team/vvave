@@ -1,3 +1,19 @@
+/*
+   Babe - tiny music player
+   Copyright 2021 Wang Rui <wangrui@jingos.com>
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+   */
+
 #ifndef BAE_H
 #define BAE_H
 
@@ -94,6 +110,7 @@ enum class TABLE : uint8_t
     LOGS,
     FOLDERS,
     ALL,
+    VIDEOS,
     NONE
 };
 
@@ -113,7 +130,8 @@ static const QMap<TABLE,QString> TABLEMAP =
     {TABLE::ARTISTS_TAGS,"artists_tags"},
     {TABLE::TRACKS_TAGS,"tracks_tags"},
     {TABLE::LOGS,"logs"},
-    {TABLE::FOLDERS,"folders"}
+    {TABLE::FOLDERS,"folders"},
+    {TABLE::VIDEOS,"videos"},
 
 };
 
@@ -220,14 +238,14 @@ const static inline QString getNameFromLocation(const QString &str)
     QString ret;
     int index = 0;
 
-    for(int i = str.size() - 1; i >= 0; i--)
-        if(str[i] == '/')
+    for (int i = str.size() - 1; i >= 0; i--)
+        if (str[i] == '/')
         {
             index = i + 1;
             i = -1;
         }
 
-    for(; index < str.size(); index++)
+    for (; index < str.size(); index++)
         ret.push_back(str[index]);
 
     return ret;
@@ -246,37 +264,36 @@ const static QString YoutubeCachePath =  QUrl::fromLocalFile(QStandardPaths::wri
 const static QString NotifyDir = SettingPath;
 
 const static QString MusicPath = FMH::MusicPath;
+const static QString VideoPath = FMH::VideosPath;
 const static QString HomePath = FMH::HomePath;
 const static QString DownloadsPath = FMH::DownloadsPath;
 
 const static QString BabePort = "8483";
 const static QString LinkPort = "3333";
 
-const static QString appName = QStringLiteral("vvave");
-const static QString displayName = QStringLiteral("Vvave");
+const static QString appName = QStringLiteral("Media");
+const static QString displayName = QStringLiteral("Media");
 const static QString version = VVAVE_VERSION_STRING;
 const static QString description = QStringLiteral("Music player");
 const static QString orgName = QStringLiteral("Maui");
-const static QString orgDomain = QStringLiteral("org.maui.vvave");
+const static QString orgDomain = QStringLiteral("kde.org");
 
 const static QString DBName = "collection.db";
 
 const static QStringList MoodColors = {"#F0FF01","#01FF5B","#3DAEFD","#B401FF","#E91E63"};
-const static QStringList defaultSources = QStringList() << BAE::MusicPath
-                                                 << BAE::DownloadsPath
-                                                 << BAE::YoutubeCachePath;
+const static QStringList defaultSources = QStringList() << BAE::HomePath;// 默认扫描路径
 
 const static inline QString fixTitle(const QString &title,const QString &s,const QString &e)
 {
     QString newTitle;
-    for(int i=0; i<title.size();i++)
-        if(title.at(i)==s)
+    for (int i=0; i<title.size(); i++)
+        if (title.at(i)==s)
         {
-            while(title.at(i)!=e)
-                if(i==title.size()-1) break;
+            while (title.at(i)!=e)
+                if (i==title.size()-1) break;
                 else i++;
 
-        }else newTitle+=title.at(i);
+        } else newTitle+=title.at(i);
 
     return newTitle.simplified();
 }
@@ -299,11 +316,11 @@ const static inline QString ucfirst(const QString &str)/*uppercase first letter*
     QStringList result;
     QString output;
 
-    if(str.contains(" "))
+    if (str.contains(" "))
     {
         tokens = str.split(" ");
 
-        for(auto str : tokens)
+        for (auto str : tokens)
         {
             str = str.toLower();
             str[0] = str[0].toUpper();
@@ -311,14 +328,13 @@ const static inline QString ucfirst(const QString &str)/*uppercase first letter*
         }
 
         output = result.join(" ");
-    }else output = str;
+    } else output = str;
 
     return output.simplified();
 }
 
 const static inline QString fixString (const QString &str)
 {
-    //title.remove(QRegExp(QString::fromUtf8("[·-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\\[\\\]\\\\]")));
     QString title = str;
     title = title.remove(QChar::Null);
     title = title.contains(QChar('\u0000')) ? title.replace(QChar('\u0000'),"") : title;
@@ -336,22 +352,20 @@ const static inline QString fixString (const QString &str)
     title = title.contains("|") ? removeSubstring(title, "|") : title;
     title = title.contains('"') ? title.replace('"', "") : title;
     title = title.contains(":") ? title.replace(":", "") : title;
-    //    title=title.contains("&")? title.replace("&", "and"):title;
-    //qDebug()<<"fixed string:"<<title;
 
     return ucfirst(title).simplified();
 }
 
- static inline bool fileExists(const QString &url)
+static inline bool fileExists(const QString &url)
 {
     return FMH::fileExists(QUrl::fromLocalFile(url));
 }
 
- static inline BAE::TABLE albumType(const FMH::MODEL &albumMap)
+static inline BAE::TABLE albumType(const FMH::MODEL &albumMap)
 {
-    if(albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
+    if (albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
         return BAE::TABLE::ARTISTS;
-    else if(!albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
+    else if (!albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
         return BAE::TABLE::ALBUMS;
 
     return BAE::TABLE::NONE;
@@ -359,10 +373,8 @@ const static inline QString fixString (const QString &str)
 
 static inline void saveArt(FMH::MODEL &track, const QByteArray &array, const QString &path)
 {
-    if(!array.isNull()&&!array.isEmpty())
+    if (!array.isNull()&&!array.isEmpty())
     {
-        // qDebug()<<"tryna save array: "<< array;
-
         QImage img;
         img.loadFromData(array);
         QString name = !track[FMH::MODEL_KEY::ALBUM].isEmpty() ? track[FMH::MODEL_KEY::ARTIST] + "_" + track[FMH::MODEL_KEY::ALBUM] : track[FMH::MODEL_KEY::ARTIST];
@@ -373,7 +385,7 @@ static inline void saveArt(FMH::MODEL &track, const QByteArray &array, const QSt
         if (img.save(path + name + ".png", format.toLatin1(), 100))
             track.insert(FMH::MODEL_KEY::ARTWORK,path + name + ".png");
         else  qDebug() << "couldn't save artwork";
-    }else qDebug()<<"array is empty";
+    } else qDebug()<<"array is empty";
 }
 
 static inline void saveSettings(const QString &key, const QVariant &value, const QString &group)
@@ -402,10 +414,10 @@ static inline bool artworkCache(FMH::MODEL &track, const FMH::MODEL_KEY &type = 
     {
         const auto file = QUrl::fromLocalFile(it.next());
         const auto fileName = QFileInfo(file.toLocalFile()).baseName();
-        switch(type)
+        switch (type)
         {
         case FMH::MODEL_KEY::ALBUM:
-            if(fileName == (track[FMH::MODEL_KEY::ARTIST]+"_"+track[FMH::MODEL_KEY::ALBUM]))
+            if (fileName == (track[FMH::MODEL_KEY::ARTIST]+"_"+track[FMH::MODEL_KEY::ALBUM]))
             {
                 track.insert(FMH::MODEL_KEY::ARTWORK, file.toString());
                 return true;
@@ -413,13 +425,14 @@ static inline bool artworkCache(FMH::MODEL &track, const FMH::MODEL_KEY &type = 
             break;
 
         case FMH::MODEL_KEY::ARTIST:
-            if(fileName == (track[FMH::MODEL_KEY::ARTIST]))
+            if (fileName == (track[FMH::MODEL_KEY::ARTIST]))
             {
                 track.insert(FMH::MODEL_KEY::ARTWORK, file.toString());
                 return true;
             }
             break;
-        default: break;
+        default:
+            break;
         }
     }
     return false;

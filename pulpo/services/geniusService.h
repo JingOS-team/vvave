@@ -23,7 +23,9 @@ public:
 
 protected:
     virtual bool parseArtist();
-    virtual bool parseAlbum(){return false;}
+    virtual bool parseAlbum() {
+        return false;
+    }
     virtual bool parseTrack();
 };
 

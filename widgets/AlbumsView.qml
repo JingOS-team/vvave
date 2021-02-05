@@ -103,7 +103,6 @@ StackView
 
     function populateTable(album, artist)
     {
-        console.log("PAPULATE ALBUMS VIEW")
         control.push(_tracksTable)
         _tracksTable.listModel.filter = ""
 
@@ -141,12 +140,6 @@ StackView
         for(var j = 0 ; j < albumsViewGrid.gridModel.count; j++)
             albumsViewGrid.gridModel.remove(j,1)
 
-
-        //        for(var match in matches)
-        //        {
-        //            albumsViewGrid.gridModel.get(match).hide = true
-        //            console.log(match)
-        //        }
     }
 
     function find(query)

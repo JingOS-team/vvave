@@ -24,7 +24,7 @@ meta_files.files = $$PWD/*appdata.xml
 #translations.files = $$PWD/translations/*.qm
 
 hicolor.path =  $${PREFIX}/share/icons/hicolor/scalable/apps
-hicolor.files = $$PWD/assets/vvave.svg
+hicolor.files = $$PWD/assets/media_icon.svg
 
 INSTALLS += target desktop_files meta_files hicolor
 

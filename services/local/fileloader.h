@@ -1,19 +1,44 @@
+/*
+   Babe - tiny music player
+   Copyright 2021 Wang Rui <wangrui@jingos.com>
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+   */
+
 #ifndef FILELOADER_H
 #define FILELOADER_H
 
 #include <QObject>
 #include <QDirIterator>
 #include <QUrl>
+#include <QPixmap>
 #include "services/local/taginfo.h"
 #include "db/collectionDB.h"
 #include "utils/bae.h"
+
+#define UNICODE
+#include <MediaInfo/MediaInfo.h>
+#include <QProcess>
+#include "vvave.h"
+#include <KFileMetaData/PropertyInfo>
+#include <KFileMetaData/UserMetaData>
+#include <kio/previewjob.h>
 
 namespace FLoader
 {
 
 static inline QList<QUrl> getPathContents(QList<QUrl> &urls, const QUrl &url)
 {
-    if(!FMH::fileExists(url) && !url.isLocalFile())
+    if (!FMH::fileExists(url) && !url.isLocalFile())
         return urls;
 
     if (QFileInfo(url.toLocalFile()).isDir())
@@ -23,38 +48,38 @@ static inline QList<QUrl> getPathContents(QList<QUrl> &urls, const QUrl &url)
         while (it.hasNext())
             urls << QUrl::fromLocalFile(it.next());
 
-    }else if (QFileInfo(url.toLocalFile()).isFile())
+    } else if (QFileInfo(url.toLocalFile()).isFile())
         urls << url.toString();
 
     return urls;
 }
 
 // returns the number of new items added to the collection db
-static inline uint getTracks(const QList<QUrl>& paths)
+static inline uint getTracks(const QList<QUrl>& paths, vvave *babe)
 {
     const auto db = CollectionDB::getInstance();
     const auto urls = std::accumulate(paths.begin(), paths.end(), QList<QUrl>(), getPathContents);
 
-    for(const auto &path : paths)
-        if(path.isLocalFile() && FMH::fileExists(path))
+    for (const auto &path : paths)
+        if (path.isLocalFile() && FMH::fileExists(path))
             db->addFolder(path.toString());
 
     uint newTracks = 0;
 
-    if(urls.isEmpty())
+    if (urls.isEmpty())
         return newTracks;
 
-    for(const auto &url : urls)
+    for (const auto &url : urls)
     {
-        if(db->check_existance(BAE::TABLEMAP[BAE::TABLE::TRACKS], FMH::MODEL_NAME[FMH::MODEL_KEY::URL], url.toString()))
+        if (db->check_existance(BAE::TABLEMAP[BAE::TABLE::TRACKS], FMH::MODEL_NAME[FMH::MODEL_KEY::URL], url.toString()))
             continue;
 
         TagInfo info(url.toLocalFile());
-        if(info.isNull())
+        if (info.isNull())
             continue;
 
-        qDebug()<< url << "HHH";
 
+        info.getCover();
         const auto track = info.getTrack();
         const auto genre = info.getGenre();
         const auto album = BAE::fixString(info.getAlbum());
@@ -76,15 +101,122 @@ static inline uint getTracks(const QList<QUrl>& paths)
             {FMH::MODEL_KEY::SOURCE, sourceUrl},
             {FMH::MODEL_KEY::FAV, "0"},
             {FMH::MODEL_KEY::RELEASEDATE, QString::number(year)}
+
         };
 
         BAE::artworkCache(trackMap, FMH::MODEL_KEY::ALBUM);
 
-        if(db->addTrack(trackMap))
+        if (db->addTrack(trackMap))
+        {
             newTracks++;
+        }
+        emit babe->refreshTables(20);
+
     }
     return newTracks;
 }
+
+static inline QList<QUrl> getPathContentsForVideo(QList<QUrl> &urls, const QUrl &url)
+{
+    if (!FMH::fileExists(url) && !url.isLocalFile())
+        return urls;
+
+    if (QFileInfo(url.toLocalFile()).isDir())
+    {
+        auto videoTypeList = QStringList() << FMH::FILTER_LIST[FMH::FILTER_TYPE::VIDEO];
+        videoTypeList.removeOne("*.ogg");
+        videoTypeList << "*.mov";
+        QDirIterator it(url.toLocalFile(), videoTypeList, QDir::Files, QDirIterator::Subdirectories);
+
+        while (it.hasNext())
+            urls << QUrl::fromLocalFile(it.next());
+
+    } else if (QFileInfo(url.toLocalFile()).isFile())
+        urls << url.toString();
+
+    return urls;
+}
+
+// returns the number of new video added to the collection db
+static inline uint getVideos(const QList<QUrl>& paths, vvave *babe)
+{
+    const auto db = CollectionDB::getInstance();
+    const auto urls = std::accumulate(paths.begin(), paths.end(), QList<QUrl>(), getPathContentsForVideo);
+
+    for (const auto &path : paths)
+        if (path.isLocalFile() && FMH::fileExists(path))
+            db->addFolder(path.toString());
+
+    uint newVideos = 0;
+
+    if (urls.isEmpty())
+        return newVideos;
+
+    for (const auto &url : urls)
+    {
+        if (db->check_existance(BAE::TABLEMAP[BAE::TABLE::VIDEOS], FMH::MODEL_NAME[FMH::MODEL_KEY::URL], url.toString()))
+            continue;
+
+        MediaInfoLib::MediaInfo MI;
+        auto duration = 0;
+        auto width = 800;
+        auto height = 600;
+        if (MI.Open(url.toLocalFile().toStdWString())) {
+            duration = QString::fromStdWString(MI.Get(MediaInfoLib::Stream_Video, 0, __T("Duration"), MediaInfoLib::Info_Text, MediaInfoLib::Info_Name)).toInt() / 1000;
+            width = QString::fromStdWString(MI.Get(MediaInfoLib::Stream_Video, 0, __T("Width"), MediaInfoLib::Info_Text, MediaInfoLib::Info_Name)).toInt();
+            width = width > 0 ? width : 800;
+            height = QString::fromStdWString(MI.Get(MediaInfoLib::Stream_Video, 0, __T("Height"), MediaInfoLib::Info_Text, MediaInfoLib::Info_Name)).toInt();
+            height = height > 0 ? height : 600;
+        }
+
+
+        auto indexOfname = url.toString().lastIndexOf("/");
+        auto name = url.toString().mid(indexOfname + 1);
+
+        auto path = url.toString();
+        int index = path.lastIndexOf(".");
+        QString newPath = path.mid(0, index);
+        index = newPath.lastIndexOf("/");
+        QString startPath = newPath.mid(0, index + 1);
+        QString endPath = newPath.mid(index + 1, newPath.length());
+        path = startPath + "." + endPath + ".jpg";
+
+        QStringList plugins;
+        plugins << KIO::PreviewJob::availablePlugins();
+        KFileItemList list;
+        list.append(KFileItem(url, QString(), 0));
+        KIO::PreviewJob *job = KIO::filePreview(list, QSize(width, height), &plugins);
+        job->setIgnoreMaximumSize(true);
+        job->setScaleType(KIO::PreviewJob::ScaleType::Unscaled);
+
+        QObject::connect(job, &KIO::PreviewJob::gotPreview, [=] (const KFileItem &item, const QPixmap &preview) {
+            preview.save(path.mid(7), "JPG");
+        });
+        QObject::connect(job, &KIO::PreviewJob::failed, [=] (const KFileItem &item) {
+            qDebug() << "getVideos gotPreview failed";
+        });
+        job->exec();
+
+        const auto sourceUrl = FMH::parentDir(url).toString();
+        FMH::MODEL videoMap =
+        {
+            {FMH::MODEL_KEY::URL, url.toString()},
+            {FMH::MODEL_KEY::SOURCE, sourceUrl},
+            {FMH::MODEL_KEY::TITLE, name},
+            {FMH::MODEL_KEY::DURATION, QString::number(duration)},
+            {FMH::MODEL_KEY::GENRE, path}
+        };
+
+        if (db->addVideo(videoMap))
+        {
+            newVideos++;
+        }
+
+        emit babe->refreshTables(20);
+    }
+    return newVideos;
+}
+
 }
 
 #endif // FILELOADER_H

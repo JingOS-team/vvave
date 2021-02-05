@@ -1,3 +1,5 @@
+## Base On vvave (https://github.com/KDE/vvave)
+
 # Building
 
 ### Build for Android
@@ -5,8 +7,8 @@ Use `qmake`:
 
 ```bash
 # Clone the code
-git clone https://invent.kde.org/kde/vvave.git
-cd vvave
+git clone github.com/jingOS-team/jing-media-player
+cd jing-media-player
 # Create build dir
 mkdir build && cd build
 # Build
@@ -18,8 +20,8 @@ make
 Use `cmake`:
 ```bash
 # Clone the code
-git clone https://invent.kde.org/kde/vvave.git
-cd vvave
+git clone github.com/jingOS-team/jing-media-player
+cd jing-media-player
 # Create build dir
 mkdir build && cd build
 # Build
@@ -30,7 +32,7 @@ sudo make install
 
 ### Dependencies
 
-If you've built vvave on some distro, please contribute here!
+If you've built Media Player on some distro, please contribute here!
 
 #### Ubuntu
 
@@ -51,7 +53,7 @@ with import <nixpkgs> {};
 
 let qtx = qt5; in
 stdenv.mkDerivation {
-  name = "vvave";
+  name = "Media Player";
 
   buildInputs = [
     appstream
@@ -105,10 +107,31 @@ qtbase qtquickcontrols2 qtquickcontrols qtgraphicaleffects qtdeclarative kirigam
 
 Next check that module `X` can be found in `$QML2_IMPORT_PATH`.
 
-### VVAVE is built and running but no sound comes out!
+### Media Player is built and running but no sound comes out!
 
 Check that you have all the correct gstreamer plugins installed:
 
 ```
 gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav
 ```
+
+# Features
+
+- Support the scan and display of audio and video files
+
+- Brand new UI & UE with JingOS-style , based on JingUI Framework
+
+- Run on JingOS platform
+
+- Support keyboard & touchpad & mouse & screen touch
+
+
+# Links
+
+- Home: www.jingos.com
+  
+- Project page: https://github.com/JingOS-team/jing-media-player
+  
+- File issues: https://github.com/JingOS-team/jing-media-player/issues
+  
+- Development channel: www.jingos.com

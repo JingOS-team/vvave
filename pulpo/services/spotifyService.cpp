@@ -14,7 +14,7 @@ bool spotify::setUpService(const ONTOLOGY &ontology, const PULPO::INFO &info)
     this->ontology = ontology;
     this->info= info;
 
-    if(!this->availableInfo[this->ontology].contains(this->info))
+    if (!this->availableInfo[this->ontology].contains(this->info))
         return false;
 
     auto url = this->API;
@@ -22,7 +22,7 @@ bool spotify::setUpService(const ONTOLOGY &ontology, const PULPO::INFO &info)
     QUrl encodedArtist(this->track[FMH::MODEL_KEY::ARTIST]);
     encodedArtist.toEncoded(QUrl::FullyEncoded);
 
-    switch(this->ontology)
+    switch (this->ontology)
     {
     case ONTOLOGY::ARTIST:
     {
@@ -56,7 +56,8 @@ bool spotify::setUpService(const ONTOLOGY &ontology, const PULPO::INFO &info)
         url.append("&type=track&limit=5");
         break;
     }
-    default: return false;
+    default:
+        return false;
     }
 
     auto credentials = this->CLIENT_ID+":"+this->CLIENT_SECRET;
@@ -79,7 +80,7 @@ bool spotify::setUpService(const ONTOLOGY &ontology, const PULPO::INFO &info)
 
     reply->deleteLater();
 
-    if(reply->error())
+    if (reply->error())
     {
         qDebug()<<reply->error();
         return false;
@@ -92,13 +93,13 @@ bool spotify::setUpService(const ONTOLOGY &ontology, const PULPO::INFO &info)
     qDebug()<< "[spotify service]: "<< url;
 
     this->array = this->startConnection(url, {{"Authorization", "Bearer "+token}});
-    if(this->array.isEmpty()) return false;
+    if (this->array.isEmpty()) return false;
 
     return this->parseArray();
 }
 
 bool spotify::parseArtist()
-{    
+{
     QJsonParseError jsonParseError;
     QJsonDocument jsonResponse = QJsonDocument::fromJson(static_cast<QString>(array).toUtf8(), &jsonParseError);
 
@@ -110,14 +111,14 @@ bool spotify::parseArtist()
     auto data = jsonResponse.object().toVariantMap();
     auto itemMap = data.value("artists").toMap().value("items");
 
-    if(itemMap.isNull()) return false;
+    if (itemMap.isNull()) return false;
     QList<QVariant> items = itemMap.toList();
 
-    if(items.isEmpty())  return false;
+    if (items.isEmpty())  return false;
 
     auto root = items.first().toMap();
 
-    if(this->info == INFO::TAGS || this->info == INFO::ALL)
+    if (this->info == INFO::TAGS || this->info == INFO::ALL)
     {
         VALUE tags;
 
@@ -132,15 +133,15 @@ bool spotify::parseArtist()
 
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::ARTIST, INFO::TAGS, tags));
 
-        if(this->info == INFO::TAGS ) return true;
+        if (this->info == INFO::TAGS ) return true;
     }
 
-    if(this->info == INFO::ARTWORK || this->info == INFO::ALL)
+    if (this->info == INFO::ARTWORK || this->info == INFO::ALL)
     {
         auto artwork = root.value("images").toList().first().toMap().value("url").toString();
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::ARTIST, INFO::ARTWORK, CONTEXT::IMAGE,this->startConnection(artwork)));
 
-        if(this->info == INFO::ARTWORK && !artwork.isEmpty() ) return true;
+        if (this->info == INFO::ARTWORK && !artwork.isEmpty() ) return true;
     }
 
     return false;
@@ -160,18 +161,18 @@ bool spotify::parseAlbum()
     auto data = mainJsonObject.toVariantMap();
     auto itemMap = data.value("albums").toMap().value("items");
 
-    if(itemMap.isNull()) return false;
+    if (itemMap.isNull()) return false;
     QList<QVariant> items = itemMap.toList();
 
-    if(items.isEmpty())  return false;
+    if (items.isEmpty())  return false;
 
-    if(this->info == INFO::ARTWORK || this->info == INFO::ALL)
+    if (this->info == INFO::ARTWORK || this->info == INFO::ALL)
     {
         auto albumArt =items.first().toMap().value("images").toList().first().toMap().value("url").toString();
         emit this->infoReady(this->track, this->packResponse(ONTOLOGY::ALBUM, INFO::ARTWORK,CONTEXT::IMAGE, startConnection(albumArt)));
         qDebug()<<"parseSpotifyAlbum ["<< albumArt<<"]";
 
-        if(this->info == INFO::ARTWORK && !albumArt.isEmpty() ) return true;
+        if (this->info == INFO::ARTWORK && !albumArt.isEmpty() ) return true;
     }
 
     return false;
@@ -192,28 +193,28 @@ bool spotify::parseTrack()
     auto data = mainJsonObject.toVariantMap();
     auto itemMap = data.value("tracks").toMap().value("items");
 
-    if(itemMap.isNull()) return false;
+    if (itemMap.isNull()) return false;
 
     QList<QVariant> items = itemMap.toList();
 
-    if(items.isEmpty()) return false;
+    if (items.isEmpty()) return false;
     //get album title
-    for(auto item : items )
+    for (auto item : items )
     {
         auto album = item.toMap().value("album").toMap();
         auto trackArtist =  album.value("artists").toList().first().toMap().value("name").toString();
 
-        if(trackArtist.contains(this->track[FMH::MODEL_KEY::ARTIST]))
+        if (trackArtist.contains(this->track[FMH::MODEL_KEY::ARTIST]))
         {
-            if(this->info == INFO::TAGS || this->info == INFO::ALL)
+            if (this->info == INFO::TAGS || this->info == INFO::ALL)
             {
                 auto popularity = item.toMap().value("popularity").toString();
                 emit this->infoReady(this->track,this->packResponse(ONTOLOGY::TRACK, INFO::TAGS, CONTEXT::TRACK_STAT,popularity));
 
-                if(this->info == INFO::TAGS ) return true;
+                if (this->info == INFO::TAGS ) return true;
             }
 
-            if(this->info == INFO::METADATA || this->info == INFO::ALL)
+            if (this->info == INFO::METADATA || this->info == INFO::ALL)
             {
                 auto trackAlbum = album.value("name").toString();
                 emit this->infoReady(this->track,this->packResponse(ONTOLOGY::TRACK, INFO::METADATA, CONTEXT::ALBUM_TITLE,trackAlbum));
@@ -221,17 +222,17 @@ bool spotify::parseTrack()
                 auto trackPosition = item.toMap().value("track_number").toString();
                 emit this->infoReady(this->track,this->packResponse(ONTOLOGY::TRACK, INFO::METADATA, CONTEXT::TRACK_NUMBER,trackPosition));
 
-                if(this->info == INFO::METADATA ) return true;
+                if (this->info == INFO::METADATA ) return true;
             }
 
-            if(this->info == INFO::ARTWORK || this->info == INFO::ALL)
+            if (this->info == INFO::ARTWORK || this->info == INFO::ALL)
             {
                 auto artwork = album.value("images").toList().first().toMap().value("url").toString();
                 emit this->infoReady(this->track,this->packResponse(ONTOLOGY::TRACK, INFO::ARTWORK,CONTEXT::IMAGE,this->startConnection(artwork)));
-                if(!artwork.isEmpty() && this->info == INFO::ARTWORK ) return true;
+                if (!artwork.isEmpty() && this->info == INFO::ARTWORK ) return true;
             }
 
-        }else continue;
+        } else continue;
     }
 
     return false;

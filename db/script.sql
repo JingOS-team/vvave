@@ -78,6 +78,20 @@ FOREIGN KEY(source) REFERENCES SOURCES(url),
 FOREIGN KEY(album, artist) REFERENCES albums(album, artist)
 );
 
+CREATE TABLE VIDEOS
+(
+url TEXT ,
+source TEXT  ,
+title   TEXT NOT NULL,
+duration    INTEGER  ,
+genre      TEXT,
+count      INTEGER  ,
+releasedate DATE ,
+adddate     DATE NOT NULL,
+PRIMARY KEY (url),
+FOREIGN KEY(source) REFERENCES SOURCES(url)
+);
+
 CREATE TABLE TRACKS_MOODS
 (
 mood  TEXT NOT NULL ,

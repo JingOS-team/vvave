@@ -37,7 +37,7 @@ YouTube::YouTube(QObject *parent) : QObject(parent)
 
 }
 
-YouTube::~YouTube(){}
+YouTube::~YouTube() {}
 
 bool YouTube::getQuery(const QString &query, const int &limit)
 {
@@ -53,7 +53,7 @@ bool YouTube::getQuery(const QString &query, const int &limit)
     qDebug()<< url;
     auto array = this->startConnection(url);
 
-    if(array.isEmpty()) return false;
+    if (array.isEmpty()) return false;
 
     return this->packQueryResults(array);
 }
@@ -73,11 +73,11 @@ bool YouTube::packQueryResults(const QByteArray &array)
     auto data = mainJsonObject.toVariantMap();
     auto items = data.value("items").toList();
 
-    if(items.isEmpty()) return false;
+    if (items.isEmpty()) return false;
 
     QVariantList res;
 
-    for(auto item : items)
+    for (auto item : items)
     {
         auto itemMap = item.toMap().value("id").toMap();
         auto id = itemMap.value("videoId").toString();
@@ -91,10 +91,10 @@ bool YouTube::packQueryResults(const QByteArray &array)
         auto artist = BAE::SLANG[W::UNKNOWN];
         auto album = BAE::SLANG[W::UNKNOWN];
 
-        if(title.contains("-"))
+        if (title.contains("-"))
         {
             auto data = title.split("-");
-            if(data.size() > 1)
+            if (data.size() > 1)
             {
                 artist = data[0].trimmed();
                 title = data[1].trimmed();
@@ -102,7 +102,7 @@ bool YouTube::packQueryResults(const QByteArray &array)
 
         }
 
-        if(!id.isEmpty())
+        if (!id.isEmpty())
         {
             qDebug()<<url<<artwork;
 
@@ -146,14 +146,14 @@ QString YouTube::getKey() const
 
 QByteArray YouTube::startConnection(const QString &url, const QMap<QString, QString> &headers)
 {
-    if(!url.isEmpty())
+    if (!url.isEmpty())
     {
         QUrl mURL(url);
         QNetworkAccessManager manager;
         QNetworkRequest request (mURL);
 
-        if(!headers.isEmpty())
-            for(auto key: headers.keys())
+        if (!headers.isEmpty())
+            for (auto key: headers.keys())
                 request.setRawHeader(key.toLocal8Bit(), headers[key].toLocal8Bit());
 
         QNetworkReply *reply =  manager.get(request);
@@ -165,13 +165,13 @@ QByteArray YouTube::startConnection(const QString &url, const QMap<QString, QStr
 
         loop.exec();
 
-        if(reply->error())
+        if (reply->error())
         {
             qDebug() << reply->error();
             return QByteArray();
         }
 
-        if(reply->bytesAvailable())
+        if (reply->bytesAvailable())
         {
             auto data = reply->readAll();
             reply->deleteLater();

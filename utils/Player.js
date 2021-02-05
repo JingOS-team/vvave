@@ -7,7 +7,8 @@ function playTrack(index)
         prevTrackIndex = currentTrackIndex
         currentTrackIndex = index
         mainPlaylist.listView.currentIndex = currentTrackIndex
-        currentTrack = mainPlaylist.listView.itemAtIndex(currentTrackIndex)
+
+        currentTrack = mainPlaylist.listModel.get(currentTrackIndex)//这个方法ok
 
         if(typeof(currentTrack) === "undefined") return
 
@@ -19,6 +20,8 @@ function playTrack(index)
 
         player.url = currentTrack.url;
         player.playing = true
+
+        mainPlaylist.listModel.list.countUp(currentTrackIndex, true)
     }
 }
 
@@ -57,17 +60,32 @@ function resumeTrack()
         playAt(0)
 }
 
-function nextTrack()
+function nextTrack(onFinish)
 {
     if(!mainlistEmpty)
     {
         var next = 0
-        if(isShuffle && onQueue === 0)
-            next = shuffle()
-        else
+        if(playType === 0)
+        {
             next = currentTrackIndex+1 >= mainPlaylist.listView.count? 0 : currentTrackIndex+1
+        }else if(playType === 1)
+        {
+            next = shuffle()
+        }else if(playType === 2)
+        {
+            if(onFinish)
+            {
+                next = currentTrackIndex
+            }else
+            {
+                next = currentTrackIndex+1 >= mainPlaylist.listView.count? 0 : currentTrackIndex + 1
+            }
+        }
 
-        prevTrackIndex = currentTrackIndex
+        if(playType != 2)
+        {
+            prevTrackIndex = currentTrackIndex
+        }
         playAt(next)
 
         if(onQueue > 0)
@@ -101,6 +119,30 @@ function playAt(index)
     }
 }
 
+function justRefreshPlayerUI(index)
+{
+    if((index < mainPlaylist.listView.count) && (mainPlaylist.listView.count > 0) && (index > -1))
+    {
+        player.playing = false
+        prevTrackIndex = currentTrackIndex
+        currentTrackIndex = index
+        mainPlaylist.listView.currentIndex = currentTrackIndex
+
+        currentTrack = mainPlaylist.listModel.get(currentTrackIndex)
+
+        if(typeof(currentTrack) === "undefined") return
+
+        if(!Maui.FM.fileExists(currentTrack.url) && String(currentTrack.url).startsWith("file://"))
+        {
+            missingAlert(currentTrack)
+            return
+        }
+
+        player.url = currentTrack.url;
+        mainPlaylist.listModel.list.countUp(currentTrackIndex, true)
+    }
+}
+
 function quickPlay(track)
 {
     //    root.pageStack.currentIndex = 0
@@ -114,7 +156,7 @@ function appendTracksAt(tracks, at)
     if(tracks)
         for(var i in tracks)
         {
-            mainPlaylist.list.append(tracks[i], parseInt(at)+parseInt(i))
+            mainPlaylist.listModel.list.append(tracks[i], parseInt(at)+parseInt(i))
         }
 }
 
@@ -122,7 +164,7 @@ function appendTrack(track)
 {
     if(track)
     {
-        mainPlaylist.list.append(track)
+        mainPlaylist.listModel.list.append(track)
         if(sync === true)
         {
            playlistsList.addTrack(syncPlaylist, [track.url])
@@ -158,7 +200,7 @@ function savePlaylist()
 
     for(var i=0 ; i < n; i++)
     {
-        var url = mainPlaylist.list.get(i).url
+        var url = mainPlaylist.listModel.list.get(i).url
         list.push(url)
     }
 
@@ -169,7 +211,7 @@ function savePlaylist()
 
 function clearOutPlaylist()
 {
-    mainPlaylist.list.clear()
+    mainPlaylist.listModel.list.clear()
     stop()
 }
 
@@ -179,11 +221,11 @@ function cleanPlaylist()
 
     for(var i = 0; i < mainPlaylist.listView.count; i++)
     {
-        var url = mainPlaylist.list.get(i).url
+        var url = mainPlaylist.listModel.list.get(i).url
 
         if(urls.indexOf(url)<0)
             urls.push(url)
-        else mainPlaylist.list.remove(i)
+        else mainPlaylist.listModel.list.remove(i)
     }
 }
 
@@ -192,7 +234,7 @@ function playAll(tracks)
     sync = false
     syncPlaylist = ""
 
-    mainPlaylist.list.clear()
+    mainPlaylist.listModel.list.clear()
     appendAll(tracks)
 
     if(_drawer.modal && !_drawer.visible)
@@ -200,4 +242,9 @@ function playAll(tracks)
 
     mainPlaylist.listView.positionViewAtBeginning()
     playAt(0)
+}
+
+function getCover(track)
+{
+    return mainPlaylist.listModel.list.getCover(track.url)
 }

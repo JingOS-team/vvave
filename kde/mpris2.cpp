@@ -125,12 +125,12 @@ void Mpris::signalUpdate(const QVariantMap &map)
         return;
     }
     QDBusMessage signal = QDBusMessage::createSignal("/org/mpris/MediaPlayer2",
-                                                     "org.freedesktop.DBus.Properties",
-                                                     "PropertiesChanged");
+                          "org.freedesktop.DBus.Properties",
+                          "PropertiesChanged");
     QVariantList args = QVariantList()
-            << "org.mpris.MediaPlayer2.Player"
-            << map
-            << QStringList();
+                        << "org.mpris.MediaPlayer2.Player"
+                        << map
+                        << QStringList();
     signal.setArguments(args);
     QDBusConnection::sessionBus().send(signal);
 }

@@ -10,7 +10,7 @@
 Player::Player(QObject *parent) : QObject(parent),
     player(new QMediaPlayer(this)),
     updater(new QTimer(this))
-{ 
+{
     this->player->setVolume(this->volume);
     connect(this->updater, &QTimer::timeout, this, &Player::update);
 }
@@ -54,9 +54,9 @@ inline QNetworkRequest getOcsRequest(const QNetworkRequest& request)
 
 bool Player::play() const
 {
-    if(this->url.isEmpty()) return false;
+    if (this->url.isEmpty()) return false;
 
-    if(!updater->isActive())
+    if (!updater->isActive())
         this->updater->start(1000);
 
     this->player->play();
@@ -66,13 +66,13 @@ bool Player::play() const
 
 void Player::pause() const
 {
-    if(this->player->isAvailable())
+    if (this->player->isAvailable())
         this->player->pause();
 }
 
 void Player::stop()
 {
-    if(this->player->isAvailable())
+    if (this->player->isAvailable())
     {
         this->player->stop();
         this->url = QString();
@@ -89,7 +89,7 @@ void Player::stop()
 
 void Player::emitState()
 {
-    switch(this->player->state())
+    switch (this->player->state())
     {
     case QMediaPlayer::PlayingState:
         this->state = Player::STATE::PLAYING;
@@ -134,7 +134,7 @@ QUrl Player::getUrl() const
 
 void Player::setVolume(const int &value)
 {
-    if(value == this->volume)
+    if (value == this->volume)
         return;
 
     this->volume = value;
@@ -161,7 +161,7 @@ void Player::setPlaying(const bool &value)
 {
     this->playing = value;
 
-    if(this->playing)
+    if (this->playing)
         this->play();
     else this->pause();
 
@@ -194,14 +194,14 @@ int Player::getPos() const
 
 void Player::update()
 {
-    if(this->player->isAvailable())
+    if (this->player->isAvailable())
     {
         this->pos = static_cast<int>(static_cast<double>(this->player->position())/this->player->duration()*1000);
         emit this->durationChanged();
         emit this->posChanged();
     }
 
-    if(this->player->state() == QMediaPlayer::StoppedState && this->updater->isActive() && this->player->position() == this->player->duration())
+    if (this->player->state() == QMediaPlayer::StoppedState && this->updater->isActive() && this->player->position() == this->player->duration())
     {
         this->finished = true;
         emit this->finishedChanged();

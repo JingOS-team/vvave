@@ -27,7 +27,7 @@ Socket::~Socket()
 
 void Socket::sendMessageTo(const int &client, const QString &message)
 {
-    if(this->m_clients.isEmpty() && this->m_clients.size()>=client)
+    if (this->m_clients.isEmpty() && this->m_clients.size()>=client)
         return;
 
     auto s_client = this->m_clients.at(client);
@@ -36,7 +36,7 @@ void Socket::sendMessageTo(const int &client, const QString &message)
 
 void Socket::sendArray(const int &client, const QByteArray &array)
 {
-    if(this->m_clients.isEmpty() && this->m_clients.size()>=client)
+    if (this->m_clients.isEmpty() && this->m_clients.size()>=client)
         return;
 
     auto s_client = this->m_clients.at(client);
