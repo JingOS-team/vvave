@@ -130,8 +130,8 @@ gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav
 
 - Home: www.jingos.com
   
-- Project page: https://github.com/JingOS-team/jing-media-player
+- Project page: https://github.com/JingOS-team/media-player
   
-- File issues: https://github.com/JingOS-team/jing-media-player/issues
+- File issues: https://github.com/JingOS-team/media-player/issues
   
 - Development channel: www.jingos.com
