@@ -1,19 +1,3 @@
-/*
-   Babe - tiny music player
-   Copyright 2021 Wang Rui <wangrui@jingos.com>
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-   */
-
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.15 as Kirigami
 import org.kde.mauikit 1.0 as Maui
@@ -48,8 +32,8 @@ import QtQml.Models 2.15
 
 Kirigami.ApplicationWindow
 {
-    fastBlurMode: true
-    fastBlurColor: "#CCF7F7F7"
+    // fastBlurMode: true
+    // fastBlurColor: "#CCF7F7F7"
 
     id: root
     
@@ -60,7 +44,7 @@ Kirigami.ApplicationWindow
     property alias mainPlaylist: mainPlaylist
     property alias selectionBar: _selectionBar
     property alias progressBar: progressBar
-    property alias dialog : _dialogLoader.item
+    // property alias dialog : _dialogLoader.item
     
 
     background.opacity: translucency ? 0.5 : 1
@@ -92,6 +76,7 @@ Kirigami.ApplicationWindow
     property bool focusView : false
     property bool musicSelectionMode : false //是否是音频编辑状态
     property bool videoSelectionMode : false //是否是视频编辑状态
+    property bool noResultState: false //当前是否为搜索无结果的状态
 
     /***************************************************/
     /******************** UI COLORS *******************/
@@ -113,7 +98,6 @@ Kirigami.ApplicationWindow
     Maui.BaseModel
     {
         id: myTracksModel
-        
         list: myTracksList
         recursiveFilteringEnabled: true
         sortCaseSensitivity: Qt.CaseInsensitive
@@ -128,33 +112,10 @@ Kirigami.ApplicationWindow
     Maui.BaseModel
     {
         id: myVideosModel
-
         list: myVideosList
         recursiveFilteringEnabled: true
         sortCaseSensitivity: Qt.CaseInsensitive
         filterCaseSensitivity: Qt.CaseInsensitive
-    }
-
-    Kirigami.JDialog
-    {
-        id: testVideo
-
-        closePolicy: Popup.CloseOnEscape
-        leftButtonText: "Cancel"
-
-        title: "Play Video?"
-        text: "Are u sure?"
-        rightButtonText: "ok"
-
-        onLeftButtonClicked:
-        {
-            close()
-        }
-
-        onRightButtonClicked:
-        {
-            videoGridView.model.list.playVideo()
-        }
     }
 
     property int jDialogType: 1 // 1--视频单独存储 2--视频单独删除 3--视频批量存储 4--视频批量删除 5--音频单独存储 6--音频单独删除 7--音频批量存储 8--音频批量删除
@@ -163,7 +124,7 @@ Kirigami.ApplicationWindow
         id: jDialog
 
         closePolicy: Popup.CloseOnEscape
-        leftButtonText: "Cancel"
+        leftButtonText: i18n("Cancel")
 
         title: 
         {
@@ -174,7 +135,7 @@ Kirigami.ApplicationWindow
                 case 5:
                 case 7:
                 {
-                    "Save to files"
+                    i18n("Save to files")
                     break
                 }
                 case 2:
@@ -182,7 +143,7 @@ Kirigami.ApplicationWindow
                 case 6:
                 case 8:
                 {
-                    "Delete"
+                    i18n("Delete")
                     break
                 }
             }
@@ -195,13 +156,13 @@ Kirigami.ApplicationWindow
                 case 1:
                 case 5:
                 {
-                    "Are you sure you want to save the file to file manager?"
+                    i18n("Are you sure you want to save the file to file manager?")
                     break
                 }
                 case 2:
                 case 6:
                 {
-                    "Are you sure you want to delete the file?"
+                    i18n("Are you sure you want to delete the file?")
                     break
                 }
                 case 3:
@@ -209,10 +170,10 @@ Kirigami.ApplicationWindow
                 {
                     if(_selectionBar.items.length > 1)
                     {
-                        "Are you sure you want to save these files to file manager?"
+                        i18n("Are you sure you want to save these files to file manager?")
                     }else
                     {
-                        "Are you sure you want to save the file to file manager?"
+                        i18n("Are you sure you want to save the file to file manager?")
                     }
                     break
                 }
@@ -221,10 +182,10 @@ Kirigami.ApplicationWindow
                 {
                     if(_selectionBar.items.length > 1)
                     {
-                        "Are you sure you want to delete these files?"
+                        i18n("Are you sure you want to delete these files?")
                     }else
                     {
-                        "Are you sure you want to delete the file?"
+                        i18n("Are you sure you want to delete the file?")
                     }
                     break
                 }
@@ -240,7 +201,7 @@ Kirigami.ApplicationWindow
                 case 5:
                 case 7:
                 {
-                    "Save"
+                    i18n("Save")
                     break
                 }
                 case 2:
@@ -248,7 +209,7 @@ Kirigami.ApplicationWindow
                 case 6:
                 case 8:
                 {
-                    "Delete"
+                    i18n("Delete")
                     break
                 }
             }
@@ -273,6 +234,10 @@ Kirigami.ApplicationWindow
                     if(videoGridView.model.list.deleteFileVideos(videoGridView.currentIndex))
                     {
                         videoGridView.model.list.removeVideos(videoGridView.currentIndex)
+                        if(videoGridView.model.getAll().length == 0)
+                        {
+                            emptyRect.visible = true
+                        }
                     }
                     break
                 }
@@ -288,6 +253,11 @@ Kirigami.ApplicationWindow
                                 break
                             }
                         }
+                    }
+
+                    if(videoGridView.model.getAll().length == 0)
+                    {
+                        emptyRect.visible = true
                     }
                     videoSelectionMode = false
                     _selectionBar.clear()
@@ -309,6 +279,10 @@ Kirigami.ApplicationWindow
                             }
                         }
                     }
+                    if(videoGridView.model.getAll().length == 0)
+                    {
+                        emptyRect.visible = true
+                    }
                     _selectionBar.clear()
                     selectCountText.text = _selectionBar.items.length 
                     videoSelectionMode = false
@@ -321,14 +295,33 @@ Kirigami.ApplicationWindow
                 }
                 case 6://音频单独删除
                 {
+                    var item = musicGridView.model.get(musicGridView.currentIndex)
                     if(musicGridView.model.list.deleteFile(musicGridView.currentIndex))
                     {
                         musicGridView.model.list.remove(musicGridView.currentIndex)
                         if(isPlaying)
                         {
-                            mainPlaylist.listModel.list.remove(musicGridView.currentIndex)
-                            Player.playAt(musicGridView.currentIndex)
-                            isFav()
+                            if(musicGridView.model.getAll().length == 0)
+                            {
+                                player.playing = !player.playing
+                                musicGridView.model.list.emitpPlayingState(player.playing)
+                                clearPlayList()
+                                currentTrack = mainPlaylist.listView.itemAtIndex(currentTrackIndex)
+                                emptyRect.visible = true
+                            }else
+                            {
+                                mainPlaylist.listModel.list.remove(musicGridView.currentIndex)
+                                if(currentTrack && currentTrack.title == item.title && currentTrack.adddate == item.adddate)//如果删除的是当前播放的歌曲，则顺势播放下一首歌曲
+                                {
+                                    Player.playAt(musicGridView.currentIndex)
+                                    isFav()
+                                }
+
+                            }
+                        }
+                        if(musicGridView.model.getAll().length == 0)
+                        {
+                            emptyRect.visible = true
                         }
                     }
                     break
@@ -369,8 +362,24 @@ Kirigami.ApplicationWindow
                     }
                     if(isPlaying)
                     {
-                        Player.playAt(0)
-                        isFav()
+                        if(musicGridView.model.getAll().length == 0)
+                        {
+                            player.playing = !player.playing
+                            musicGridView.model.list.emitpPlayingState(player.playing)
+                            clearPlayList()
+                            currentTrack = mainPlaylist.listView.itemAtIndex(currentTrackIndex)
+                            emptyRect.visible = true
+                        }else
+                        {
+                            Player.playAt(0)
+                            isFav()
+                        }
+                    }else
+                    {
+                        if(musicGridView.model.getAll().length == 0)
+                        {
+                            emptyRect.visible = true
+                        }
                     }
                     _selectionBar.clear()
                     selectCountText.text = _selectionBar.items.length 
@@ -387,6 +396,7 @@ Kirigami.ApplicationWindow
     {
         Player.savePlaylist()
     }
+
     onMissingAlert:
     {
         var message = qsTr("Missing file")
@@ -414,12 +424,17 @@ Kirigami.ApplicationWindow
         }
     }
 
-    SelectionBar
+    // SelectionBar
+    // {
+    //     id: _selectionBar
+
+    //     visible: false
+    //     property alias listView: _selectionBar.selectionList
+    // }
+
+    SelectionBar1
     {
         id: _selectionBar
-
-        visible: false
-        property alias listView: _selectionBar.selectionList
     }
 
     Loader
@@ -438,27 +453,94 @@ Kirigami.ApplicationWindow
 
         anchors.fill: parent
 
-        Connections
-        {
-            target: mainPlaylist
-            onCoverPressed: Player.appendAll(tracks)
-            onCoverDoubleClicked: Player.playAll(tracks)
-        }
+        // Connections
+        // {
+        //     target: mainPlaylist
+        //     onCoverPressed: Player.appendAll(tracks)
+        //     onCoverDoubleClicked: Player.playAll(tracks)
+        // }
     }      
 
-    readonly property color backGroundColor: "#FFF7F7F7"
+
+    Kirigami.JPopupMenu 
+    {
+        id: musicPopup
+
+        Action { 
+            text: i18n("Batch editing")
+            icon.source: "qrc:/assets/popupDialog/bat_edit.png"
+            onTriggered:
+            {
+                musicSelectionMode = true
+                _selectionBar.clear()
+                selectCountText.text = _selectionBar.items.length
+                // close()
+            }
+        }
+
+        Kirigami.JMenuSeparator { }
+
+        Action { 
+            text: i18n("Delete")
+            icon.source: "qrc:/assets/popupDialog/delete.png"
+            onTriggered:
+            {
+                jDialogType = 6
+                jDialog.open()
+                // close()
+            }
+        }
+    }
+
+    Kirigami.JPopupMenu 
+    {
+        id: videoPopup
+
+        Action { 
+            text: i18n("Batch editing")
+            icon.source: "qrc:/assets/popupDialog/bat_edit.png"
+            onTriggered:
+            {
+                videoSelectionMode = true
+                _selectionBar.clear()
+                selectCountText.text = _selectionBar.items.length
+                // close()
+            }
+        }
+
+        Kirigami.JMenuSeparator { }
+
+        Action { 
+            text: i18n("Delete")
+            icon.source: "qrc:/assets/popupDialog/delete.png"
+            onTriggered:
+            {
+                jDialogType = 2
+                jDialog.open()
+                // close()
+            }
+        }
+    }
+
+    // readonly property color backGroundColor: "#FFF7F7F7"
     
     Rectangle//整个屏幕
     {
         id: wholeScreen
 
         anchors.fill: parent
+        // width: 1920
+        // height: 1080
 
-        color: "#00000000"
-        
+        // color: "#00000000"
+        color: "#FFE8EFFF"
+
         Row
         {
             anchors.fill: parent
+
+            // anchors.top: topSpaceRect.bottom
+            anchors.topMargin: 30
 
             spacing: parent.width / 30
 
@@ -480,18 +562,52 @@ Kirigami.ApplicationWindow
                     width: parent.width
                     height: wholeScreen.width / 28.23
 
-                    Image
-                    {   
-                        id: mediaIcon    
+                    // Image
+                    // {   
+                    //     id: mediaIcon    
 
+                    //     anchors.left: parent.left
+                    //     anchors.leftMargin: wholeScreen.width / 38.4 
+
+                    //     width: wholeScreen.width / 28.23 
+                    //     height: wholeScreen.width / 28.23 
+
+                    //     source: "assets/media_title.png"
+                    //     fillMode: Image.PreserveAspectFit
+
+                    //     MouseArea {
+                    //         anchors.fill: parent
+
+                    //         onDoubleClicked:
+                    //         {
+                    //             Qt.quit()
+                    //         }
+
+                    //     }
+                    // }
+
+                    Text
+                    {
+                        id: mediaText
+
+                        anchors.top: wholeScreen.top
+                        anchors.topMargin: wholeScreen.height / 30
+                        // anchors.left: mediaIcon.right
+                        // anchors.leftMargin: wholeScreen.width / 96
                         anchors.left: parent.left
                         anchors.leftMargin: wholeScreen.width / 38.4 
 
-                        width: wholeScreen.width / 28.23 
-                        height: wholeScreen.width / 28.23 
+                        width: parent.width
 
-                        source: "assets/media_title.png"
-                        fillMode: Image.PreserveAspectFit
+                        text: i18n("Media")
+                        elide: Text.ElideRight
+                        color: '#FF000000'
+                        font
+                        {
+                            // pointSize: theme.defaultFont.pointSize + 18
+                            pixelSize: 25
+                            bold: true
+                        }
 
                         MouseArea {
                             anchors.fill: parent
@@ -501,27 +617,6 @@ Kirigami.ApplicationWindow
                                 Qt.quit()
                             }
 
-                        }
-                    }
-
-                    Text
-                    {
-                        id: mediaText
-
-                        anchors.top: wholeScreen.top
-                        anchors.topMargin: wholeScreen.height / 30
-                        anchors.left: mediaIcon.right
-                        anchors.leftMargin: wholeScreen.width / 96
-
-                        width: parent.width
-
-                        text: "Media"
-                        elide: Text.ElideRight
-                        color: '#FF000000'
-                        font
-                        {
-                            pointSize: theme.defaultFont.pointSize + 18
-                            bold: true
                         }
                     }
                 }
@@ -536,11 +631,10 @@ Kirigami.ApplicationWindow
                     anchors.leftMargin: wholeScreen.width / 38.4 - wholeScreen.width / 96
 
                     width: parent.width - parent.width / 6.4 + wholeScreen.width / 96
-                    height: wholeScreen.height / 22.22
 
                     focus: false
                     placeholderText: ""
-                    Accessible.name: qsTr("Search")
+                    Accessible.name: i18n("Search")
                     Accessible.searchEdit: true
                     focusSequence: "Ctrl+F"
 
@@ -567,14 +661,33 @@ Kirigami.ApplicationWindow
                             }
                         }
 
-                        if(filterStatus != "" && videoGridView.model.getAll().length == 0)
+                        if(filterStatus != "")
                         {
-                            searchResultText.visible = true
-                        }else if(filterStatus != "" && musicGridView.model.getAll().length == 0)
-                        {
-                            searchResultText.visible = true
+                            if(currentPage <= 3)//视频
+                            {
+                                if(videoGridView.model.getAll().length == 0)
+                                {
+                                    noResultState = true
+                                    emptyRect.visible = true
+                                }else
+                                {
+                                    noResultState = false
+                                    emptyRect.visible = false
+                                }
+                            }else //音频
+                            {
+                                if(musicGridView.model.getAll().length == 0)
+                                {
+                                    noResultState = true
+                                    emptyRect.visible = true
+                                }else
+                                {
+                                    noResultState = false
+                                    emptyRect.visible = false
+                                }
+                            }
                         }
-                        else if(text == "" && (videoGridView.model.getAll().length > 0 || musicGridView.model.getAll().length > 0))
+                        else if(text == "")
                         {
                             setCurrentPage(currentPage, false)
                         }
@@ -592,12 +705,12 @@ Kirigami.ApplicationWindow
 
                     width: parent.width
 
-                    text: "Video"
+                    text: i18n("Video")
                     elide: Text.ElideRight
                     color: '#4D000000'
                     font
                     {
-                        pointSize: theme.defaultFont.pointSize - 2
+                        pixelSize: 12
                     }
                 }
 
@@ -611,10 +724,10 @@ Kirigami.ApplicationWindow
                     anchors.leftMargin: wholeScreen.width / 76.8
 
                     width: parent.width - parent.width / 9.6
-                    height: wholeScreen.height / 15.38
+                    height: 39
 
                     color: currentPage == 1 ? "#FF43BDF4" : "#00000000"  
-                    radius: 15
+                    radius: 10
 
                     MouseArea 
                     {
@@ -653,8 +766,8 @@ Kirigami.ApplicationWindow
                         anchors.leftMargin: wholeScreen.width / 76.8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        width: wholeScreen.height / 37.5
-                        height: wholeScreen.height / 37.5
+                        width: 16
+                        height: 16
 
                         source: currentPage == 1 ? "assets/menu/video_all_select.png" : "assets/menu/video_all_unselect.png"
                         fillMode: Image.PreserveAspectFit
@@ -668,12 +781,12 @@ Kirigami.ApplicationWindow
 
                         width: parent.width
 
-                        text: "All"
+                        text: i18n("All")
                         elide: Text.ElideRight
                         color: currentPage == 1 ? '#FFFFFFFF' : '#FF000000'
                         font
                         {
-                            pointSize: theme.defaultFont.pointSize + 2
+                            pixelSize: 14
                         }
                     }
                 }
@@ -687,10 +800,10 @@ Kirigami.ApplicationWindow
                     anchors.leftMargin: wholeScreen.width / 76.8
 
                     width: parent.width - parent.width / 9.6
-                    height: wholeScreen.height / 15.38
+                    height: 39
 
                     color: currentPage == 3 ? "#FF43BDF4" : "#00000000"
-                    radius: 15
+                    radius: 10
 
                     MouseArea 
                     {
@@ -729,8 +842,8 @@ Kirigami.ApplicationWindow
                         anchors.leftMargin: wholeScreen.width / 76.8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        width: wholeScreen.height / 37.5
-                        height: wholeScreen.height / 37.5
+                        width: 16
+                        height: 16
 
                         source: currentPage == 3 ? "assets/menu/video_lately_select.png" : "assets/menu/video_lately_unselect.png"
                         fillMode: Image.PreserveAspectFit
@@ -750,12 +863,12 @@ Kirigami.ApplicationWindow
 
                         width: parent.width
 
-                        text: "Lately"
+                        text: i18n("Lately")
                         elide: Text.ElideRight
                         color: currentPage == 3 ? '#FFFFFFFF' : '#FF000000'
                         font
                         {
-                            pointSize: theme.defaultFont.pointSize + 2
+                            pixelSize: 14
                         }
                     }
                 }
@@ -772,12 +885,12 @@ Kirigami.ApplicationWindow
                     anchors.top: videoLatelyRow.bottom
                     anchors.topMargin: wholeScreen.height / 15.38
 
-                    text: "Music"
+                    text: i18n("Music")
                     elide: Text.ElideRight
                     color: '#4D000000'
                     font
                     {
-                        pointSize: theme.defaultFont.pointSize - 2
+                        pixelSize: 12
                     }
                 }
 
@@ -791,10 +904,10 @@ Kirigami.ApplicationWindow
                     anchors.leftMargin: wholeScreen.width / 76.8
 
                     width: parent.width - parent.width / 9.6
-                    height: wholeScreen.height / 15.38
+                    height: 39
 
                     color: currentPage == 4 ? "#FF43BDF4" : "#00000000"
-                    radius: 15
+                    radius: 10
 
                     MouseArea 
                     {
@@ -833,8 +946,8 @@ Kirigami.ApplicationWindow
                         anchors.left: parent.left
                         anchors.leftMargin: wholeScreen.width / 76.8
 
-                        width: wholeScreen.height / 37.5
-                        height: wholeScreen.height / 37.5
+                        width: 16
+                        height: 16
 
                         source: currentPage == 4 ? "assets/menu/music_all_select.png" : "assets/menu/music_all_unselect.png"
                         fillMode: Image.PreserveAspectFit
@@ -848,12 +961,12 @@ Kirigami.ApplicationWindow
 
                         width: parent.width
 
-                        text: "All"
+                        text: i18n("All")
                         elide: Text.ElideRight
                         color: currentPage == 4 ? '#FFFFFFFF' : '#FF000000'
                         font
                         {
-                            pointSize: theme.defaultFont.pointSize + 2
+                           pixelSize: 14
                         }
 
                     }
@@ -869,10 +982,10 @@ Kirigami.ApplicationWindow
                     anchors.leftMargin: wholeScreen.width / 76.8
 
                     width: parent.width - parent.width / 9.6
-                    height: wholeScreen.height / 15.38
+                    height: 39
 
                     color: currentPage == 5 ? "#FF43BDF4" : "#00000000"
-                    radius: 15
+                    radius: 10
 
                     MouseArea 
                     {
@@ -912,8 +1025,8 @@ Kirigami.ApplicationWindow
                         anchors.leftMargin: wholeScreen.width / 76.8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        width: wholeScreen.height / 37.5
-                        height: wholeScreen.height / 37.5
+                        width: 16
+                        height: 16
 
                         source: currentPage == 5 ? "assets/menu/music_like_select1.svg" : "assets/menu/music_like_unselect1.svg"
                         fillMode: Image.PreserveAspectFit
@@ -933,12 +1046,12 @@ Kirigami.ApplicationWindow
                         anchors.left: musicLikeIcon.right
                         anchors.leftMargin: wholeScreen.width / 96
 
-                        text: "Like"
+                        text: i18n("Like")
                         elide: Text.ElideRight
                         color: currentPage == 5 ? '#FFFFFFFF' : '#FF000000'
                         font
                         {
-                            pointSize: theme.defaultFont.pointSize + 2
+                            pixelSize: 14
                         }
                     }
                 }
@@ -952,10 +1065,10 @@ Kirigami.ApplicationWindow
                     anchors.leftMargin: wholeScreen.width / 76.8
 
                     width: parent.width - parent.width / 9.6
-                    height: wholeScreen.height / 15.38
+                    height: 39
 
                     color: currentPage == 6 ? "#FF43BDF4" : "#00000000"
-                    radius: 15
+                    radius: 10
 
                     MouseArea 
                     {
@@ -994,8 +1107,8 @@ Kirigami.ApplicationWindow
                         anchors.leftMargin: wholeScreen.width / 76.8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        width: wholeScreen.height / 37.5
-                        height: wholeScreen.height / 37.5
+                        width: 16
+                        height: 16
                         source: currentPage == 6 ? "assets/menu/music_lately_select.png" : "assets/menu/music_lately_unselect.png"
                         fillMode: Image.PreserveAspectFit
 
@@ -1014,12 +1127,12 @@ Kirigami.ApplicationWindow
                         anchors.left: musicLatelyIcon.right
                         anchors.leftMargin: wholeScreen.width / 96
 
-                        text: "Lately"
+                        text: i18n("Lately")
                         elide: Text.ElideRight
                         color: currentPage == 6 ? '#FFFFFFFF' : '#FF000000'
                         font
                         {
-                            pointSize: theme.defaultFont.pointSize + 2
+                            pixelSize: 14
                         }
                     }
                 }
@@ -1039,8 +1152,8 @@ Kirigami.ApplicationWindow
                     anchors.top: parent.top
                     anchors.topMargin: wholeScreen.height / 30 + ((wholeScreen.width / 28.23 - (wholeScreen.width / 43.63 + wholeScreen.height / 120))) / 2
 
-                    width: wholeScreen.width / 43.63 + wholeScreen.height / 120
-                    height: wholeScreen.width / 43.63 + wholeScreen.height / 120
+                    width: 22 + 10
+                    height: 22 + 10
 
                     source: "qrc:/assets/back_arrow.png"
 
@@ -1054,14 +1167,10 @@ Kirigami.ApplicationWindow
                             false
                         }
                     }
-                    MouseArea 
-                    {
-                        anchors.fill: parent
                         onClicked: 
                         {
                             setCurrentPage(currentPage, true)
                         }
-                    }
                 }
 
                 Text//顶部Title
@@ -1082,7 +1191,7 @@ Kirigami.ApplicationWindow
                     {
                         if(filterStatus != "")
                         {
-                            wholeScreen.height / 120
+                            10
                         }else
                         {
                             0
@@ -1098,23 +1207,23 @@ Kirigami.ApplicationWindow
                     {
                         if(filterStatus != "")
                         {
-                            "Search Results"    
+                            i18n("Search Results")    
                         }else if(currentPage == 1 || currentPage == 4)
                         {
-                            "All"
+                           i18n("All")
                         }else if(currentPage == 2 || currentPage == 5)
                         {
-                            "Like"
+                            i18n("Like")
                         }else if(currentPage == 3 || currentPage == 6)
                         {
-                            "Lately"
+                            i18n("Lately")
                         }
                     }
                     elide: Text.ElideRight
                     color: '#FF000000'
                     font
                     {
-                        pointSize: theme.defaultFont.pointSize + 18
+                        pixelSize: 25
                         bold: true
                     }
                     
@@ -1131,21 +1240,22 @@ Kirigami.ApplicationWindow
                     visible: musicSelectionMode || videoSelectionMode
                     color: "#00000000"
 
-                    Image {//全选
+                    // Image {//全选
+                    Kirigami.JIconButton {
                         id: selectAllImage
 
                         anchors.verticalCenter: parent.verticalCenter
 
-                        width: wholeScreen.width / 43.63
-                        height: wholeScreen.width / 43.63
+                        width: 22 + 10
+                        height: 22 + 10
 
                         source: 
                         {
-                                "assets/check_status.png"
+                                "qrc:/assets/check_status.png"
                         }
                         
-                        MouseArea {
-                            anchors.fill: parent
+                        // MouseArea {
+                            // anchors.fill: parent
                             onClicked: {  
                                 if(musicSelectionMode)//音乐
                                 {
@@ -1155,10 +1265,11 @@ Kirigami.ApplicationWindow
                                     }else
                                     {
                                         _selectionBar.clear()
-                                        for(var i = 0; i < musicGridView.model.getAll().length; i++)
-                                        {
-                                            H.addToSelection(musicGridView.model.get(i))
-                                        }  
+                                        // for(var i = 0; i < musicGridView.model.getAll().length; i++)
+                                        // {
+                                        //     H.addToSelection(musicGridView.model.get(i))
+                                        // }  
+                                        selectAll(2)
                                     }
                                     selectCountText.text = _selectionBar.items.length
                                 }else if(videoSelectionMode)//视频
@@ -1169,15 +1280,16 @@ Kirigami.ApplicationWindow
                                     }else
                                     {
                                         _selectionBar.clear()
-                                        for(var i = 0; i < videoGridView.model.getAll().length; i++)
-                                        {
-                                            H.addToSelection(videoGridView.model.get(i))
-                                        }  
+                                        // for(var i = 0; i < videoGridView.model.getAll().length; i++)
+                                        // {
+                                        //     H.addToSelection(videoGridView.model.get(i))
+                                        // }  
+                                        selectAll(1)
                                     }
                                     selectCountText.text = _selectionBar.items.length
                                 }   
                             }
-                        }
+                        // }
 
                         Connections
                         {
@@ -1187,19 +1299,19 @@ Kirigami.ApplicationWindow
                             {
                                 if(_selectionBar.items.length == 0)
                                 {
-                                    selectAllImage.source = "assets/unselect_rect_enable.png"
-                                    saveImage.source = "assets/save.png"
-                                    deleteImage.source = "assets/delete.png"
+                                    selectAllImage.source = "qrc:/assets/unselect_rect_enable.png"
+                                    // saveImage.source = "assets/save.png"
+                                    deleteImage.source = "qrc:/assets/delete.png"
                                 }
                                 else if((currentPage < 4 && _selectionBar.items.length == videoGridView.model.getAll().length) || (currentPage >= 4 && _selectionBar.items.length == musicGridView.model.getAll().length))
                                 {
-                                    selectAllImage.source = "assets/select_rect.png"
-                                    deleteImage.source = "assets/delete_enable.png"
+                                    selectAllImage.source = "qrc:/assets/select_rect.png"
+                                    deleteImage.source = "qrc:/assets/delete_enable.png"
                                 }
                                 else
                                 {
-                                    selectAllImage.source = "assets/check_status_enable.png"
-                                    deleteImage.source = "assets/delete_enable.png"
+                                    selectAllImage.source = "qrc:/assets/check_status_enable.png"
+                                    deleteImage.source = "qrc:/assets/delete_enable.png"
                                 }                                 
                             }
 
@@ -1207,25 +1319,25 @@ Kirigami.ApplicationWindow
                             {
                                 if(_selectionBar.items.length == 0)
                                 {
-                                    selectAllImage.source = "assets/unselect_rect_enable.png"
-                                    saveImage.source = "assets/save.png"
-                                    deleteImage.source = "assets/delete.png"
+                                    selectAllImage.source = "qrc:/assets/unselect_rect_enable.png"
+                                    // saveImage.source = "assets/save.png"
+                                    deleteImage.source = "qrc:/assets/delete.png"
                                 }else if((currentPage < 4 && _selectionBar.items.length == videoGridView.model.getAll().length) || (currentPage >= 4 && _selectionBar.items.length == musicGridView.model.getAll().length))
                                 {
-                                    selectAllImage.source = "assets/select_rect.png"
-                                    deleteImage.source = "assets/delete_enable.png"
+                                    selectAllImage.source = "qrc:/assets/select_rect.png"
+                                    deleteImage.source = "qrc:/assets/delete_enable.png"
                                 }else
                                 {
-                                    selectAllImage.source = "assets/check_status_enable.png"
-                                    deleteImage.source = "assets/delete_enable.png"
+                                    selectAllImage.source = "qrc:/assets/check_status_enable.png"
+                                    deleteImage.source = "qrc:/assets/delete_enable.png"
                                 }
                             }
 
                             onCleared:
                             {
-                                selectAllImage.source = "assets/unselect_rect_enable.png"
-                                saveImage.source = "assets/save.png"
-                                deleteImage.source = "assets/delete.png"
+                                selectAllImage.source = "qrc:/assets/unselect_rect_enable.png"
+                                // saveImage.source = "assets/save.png"
+                                deleteImage.source = "qrc:/assets/delete.png"
                             }
                         }
                     }
@@ -1234,37 +1346,38 @@ Kirigami.ApplicationWindow
                         anchors.left: selectAllImage.right
                         anchors.leftMargin: wholeScreen.width / 192
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: theme.defaultFont.pointSize + 2
+                        font.pixelSize: 14
                         text: "1"
                         color: "#FF000000"
                     }
 
-                    Image {//批量存储文件
-                        id: saveImage
+                    // Image {//批量存储文件
+                    //     id: saveImage
 
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: selectAllImage.right
-                        anchors.leftMargin: wholeScreen.width / 4.43
+                    //     anchors.verticalCenter: parent.verticalCenter
+                    //     anchors.left: selectAllImage.right
+                    //     anchors.leftMargin: wholeScreen.width / 4.43
 
-                        width: wholeScreen.width / 43.63
-                        height: wholeScreen.width / 43.63
-                        source: "assets/save.png"
-                    }
+                    //     width: wholeScreen.width / 43.63
+                    //     height: wholeScreen.width / 43.63
+                    //     source: "assets/save.png"
+                    // }
 
-                    Image {//批量删除文件
+                    // Image {//批量删除文件
+                    Kirigami.JIconButton{
                         id: deleteImage
 
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: saveImage.right
-                        anchors.leftMargin: wholeScreen.width / 5.55
+                        anchors.left: selectAllImage.right
+                        anchors.leftMargin: (parent.width - width) / 2 - width
 
-                        width: wholeScreen.width / 43.63
-                        height: wholeScreen.width / 43.63
+                        width: 22 + 10
+                        height: 22 + 10
 
-                        source: "assets/delete.png"
+                        source: "qrc:/assets/delete.png"
 
-                        MouseArea {
-                            anchors.fill: parent
+                        // MouseArea {
+                            // anchors.fill: parent
                             onClicked: {  
                                     if(_selectionBar.items.length > 0)
                                     {
@@ -1272,10 +1385,10 @@ Kirigami.ApplicationWindow
                                         {
                                             if(_selectionBar.items.length ==  1)
                                             {
-                                                jDialog.text = "Are you sure you want to delete the file?"
+                                                jDialog.text = i18n("Are you sure you want to delete the file?")
                                             }else if(_selectionBar.items.length > 1)
                                             {
-                                                jDialog.text =  "Are you sure you want to delete these files?"
+                                                jDialog.text =  i18n("Are you sure you want to delete these files?")
                                             }
                                             jDialogType = 8
                                             jDialog.open()
@@ -1283,52 +1396,35 @@ Kirigami.ApplicationWindow
                                         {
                                             if(_selectionBar.items.length ==  1)
                                             {
-                                                jDialog.text = "Are you sure you want to delete the file?"
+                                                jDialog.text = i18n("Are you sure you want to delete the file?")
                                             }else if(_selectionBar.items.length > 1)
                                             {
-                                                jDialog.text =  "Are you sure you want to delete these files?"
+                                                jDialog.text =  i18n("Are you sure you want to delete these files?")
                                             }
                                             jDialogType = 4
                                             jDialog.open()
                                         }
                                     }
                             }
-                        }
+                        // }
                     }
 
-                    Image {//取消编辑态
+                    // Image {//取消编辑态
+                    Kirigami.JIconButton {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
 
-                        width: wholeScreen.width / 43.63
-                        height: wholeScreen.width / 43.63
+                        width: 22 + 10
+                        height: 22 + 10
 
-                        source: "assets/cancel_enable.png"
+                        source: "qrc:/assets/cancel_enable.png"
                         
-                        MouseArea {
-                            anchors.fill: parent
+                        // MouseArea {
+                            // anchors.fill: parent
                             onClicked: {  
                                 cancelEdit()
                             }
-                        }
-                    }
-                }
-
-                Text//如果搜索没有任何结果
-                {
-                    id: searchResultText
-
-                    anchors.top: contentTitle.bottom
-                    anchors.topMargin: wholeScreen.height / 48
-                    anchors.left: parent.left
-
-                    visible: false
-                    text: "No Results"    
-                    elide: Text.ElideRight
-                    color: '#FF000000'
-                    font
-                    {
-                        pointSize: theme.defaultFont.pointSize + 6
+                        // }
                     }
                 }
 
@@ -1346,11 +1442,11 @@ Kirigami.ApplicationWindow
                     height: parent.height 
                     
                     cellWidth: parent.width / 2
-                    cellHeight: wholeScreen.height / 7 - wholeScreen.height / 80
+                    cellHeight: (wholeScreen.width / 2.85 - wholeScreen.height / 60) / 4.37 + wholeScreen.height / 80//wholeScreen.height / 7 - wholeScreen.height / 80
                     delegate: musicDelegate
                     focus: true
                     clip: true
-                    cacheBuffer: height * 1.5
+                    cacheBuffer: height * 1.5   
                     visible:
                     {
                         if(currentPage >= 4)
@@ -1367,7 +1463,7 @@ Kirigami.ApplicationWindow
                         myTracksModel
                     }
 
-                    footer: ItemDelegate
+                    footer: ItemDelegate//因为播放时有底部播放器盖在最上层，会导致列表最底部被遮住。所以给一个同样高度的footer。避免这个问题
                     {
                         width: parent.width
                         height: 
@@ -1397,6 +1493,46 @@ Kirigami.ApplicationWindow
                             color:"#00000000"
                         }
                     }
+
+                    Connections
+                    {
+                        target: Vvave.Vvave
+                        onPlayThirdMusic: //播放外部传入的音乐
+                        {
+                            
+                            setCurrentPage(4, true)
+                            var index = 0
+                            for(var i = 0; i < musicGridView.model.getAll().length; i++)
+                            {
+                                if(source === musicGridView.model.get(i).url)
+                                {
+                                    index = i
+                                    break
+                                }
+                            }
+
+                            musicGridView.currentIndex = index
+                            clearPlayList()
+                            Player.appendAll(musicGridView.model.getAll())
+                            Player.playAt(index)
+                            isFav()
+                            currentPlayPage = currentPage;
+                        }
+                    }
+
+                    // Connections
+                    // {
+                    //     target: Vvave.Vvave
+                    //     onRefreshTables: 
+                    //     {
+                    //         // setCurrentPage(currentPage, true)
+                    //         if(currentPage == 4)
+                    //         {
+                    //             musicGridView.model.list.query = Q.GET.allTracks
+                    //         }   
+                            
+                    //     }
+                    // }
                 }
                 Component 
                 {
@@ -1411,7 +1547,7 @@ Kirigami.ApplicationWindow
                         property bool checked
                         checked: selectionBar.contains(model.url)
                         color: "#FFFFFFFF"
-                        radius: 20
+                        radius: 10
 
                         Rectangle{ 
                             id:imageRect
@@ -1422,7 +1558,7 @@ Kirigami.ApplicationWindow
                             width: wapper.height
                             height: wapper.height
 
-                            radius: 20
+                            radius: 10
 
                             Image {
                                 id: coverImage
@@ -1446,7 +1582,7 @@ Kirigami.ApplicationWindow
 
                                 anchors.fill: parent
 
-                                radius: 20
+                                radius: 10
                                 visible: false
                             }
                             OpacityMask{
@@ -1471,16 +1607,17 @@ Kirigami.ApplicationWindow
                             Text {
                                 id:name
 
+                                anchors.left: parent.left
                                 anchors.bottom: album.top
                                 anchors.bottomMargin: wholeScreen.height / 150
 
-                                width: wapper.width - wapper.height - wholeScreen.width / 64 - wholeScreen.width / 43.63 - wholeScreen.width / 106.67 * 2
+                                width: parent.width
 
-                                font.pointSize: theme.defaultFont.pointSize + 2
+                                font.pixelSize: 14
                                 text: model.title
                                 color: 
                                 {
-                                    if(currentPlayPage == currentPage && currentTrack && currentTrackIndex == index)
+                                    if(currentPlayPage == currentPage && currentTrack && currentTrack.title == model.title && currentTrack.adddate == model.adddate)
                                     {
                                         "#FF43BDF4"
                                     }else
@@ -1491,6 +1628,27 @@ Kirigami.ApplicationWindow
                                 elide: Text.ElideRight
                             }
 
+                            AnimatedImage
+                            {
+                                id: gifImage
+
+                                width: 10
+                                height: width
+
+                                fillMode: Image.PreserveAspectFit
+
+                                anchors.bottom: album.top
+                                anchors.bottomMargin: wholeScreen.height / 150 + 5
+                                anchors.left: parent.left
+                                anchors.leftMargin: name.contentWidth + 10
+
+                                source: "qrc:/assets/playing.gif"
+
+                                visible: currentPlayPage == currentPage && currentTrack && currentTrack.title == model.title && currentTrack.adddate == model.adddate
+
+                                playing: visible && player.playing
+                            }
+
                             Text {
                                 id:album
 
@@ -1498,11 +1656,26 @@ Kirigami.ApplicationWindow
 
                                 width: wapper.width - wapper.height - wholeScreen.width / 64 - wholeScreen.width / 43.63 - wholeScreen.width / 106.67 * 2
 
-                                text: model.artist + " · 《" + model.album + "》"
-                                font.pointSize: theme.defaultFont.pointSize - 5
+                                text: //如果都是未知的 只展示一个UNKNOWN   如果是只识别到一个，另外一个没有识别到的就不写了
+                                {
+                                    if(model.artist == "UNKNOWN" && model.album == "UNKNOWN")
+                                    {
+                                        i18n(model.artist)
+                                    }else if(model.artist != "UNKNOWN" && model.album == "UNKNOWN")
+                                    {
+                                        i18n(model.artist)
+                                    }else if(model.artist == "UNKNOWN" && model.album != "UNKNOWN")
+                                    {
+                                        "《" + i18n(model.album) + "》"
+                                    }else
+                                    {
+                                        i18n(model.artist) + " · 《" + i18n(model.album) + "》"
+                                    }
+                                }
+                                font.pixelSize: 10
                                 color: 
                                 {
-                                    if(currentPlayPage == currentPage && currentTrack && currentTrackIndex == index)
+                                    if(currentPlayPage == currentPage && currentTrack && currentTrack.title == model.title && currentTrack.adddate == model.adddate)
                                     {
                                         "#FF43BDF4"
                                     }else
@@ -1520,10 +1693,11 @@ Kirigami.ApplicationWindow
                                 anchors.topMargin: wholeScreen.height / 150
 
                                 text: player.transformTime(model.duration) 
-                                font.pointSize: theme.defaultFont.pointSize - 5
+                                font.pixelSize: 10
                                 color: 
                                 {
-                                    if(currentPlayPage == currentPage && currentTrack && currentTrackIndex == index)
+                                    //if(currentPlayPage == currentPage && currentTrack && currentTrackIndex == index)
+                                    if(currentPlayPage == currentPage && currentTrack && currentTrack.title == model.title && currentTrack.adddate == model.adddate)
                                     {
                                         "#FF43BDF4"
                                     }else
@@ -1540,10 +1714,10 @@ Kirigami.ApplicationWindow
 
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
-                            anchors.rightMargin: wholeScreen.width / 106.67 + wholeScreen.height / 120
+                            anchors.rightMargin: 9
 
-                            width: wholeScreen.width / 43.63
-                            height: wholeScreen.width / 43.63
+                            width: 22
+                            height: 22
 
                             cache: false
                             source: 
@@ -1566,237 +1740,6 @@ Kirigami.ApplicationWindow
                                     false
                                 }
                             } 
-                        }
-
-                        Menu
-                        {
-                            id: musicPopup
-
-                            parent: Overlay.overlay
-
-                            width: wholeScreen.width / 4.8
-                            height: wholeScreen.height / 4.44
-
-                            modal: false
-                            focus: true
-                            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                            background: Rectangle
-                            {
-                                radius: 18
-                                ShaderEffectSource
-                                {
-                                    id: footerBlur
-
-                                    width: parent.width
-                                    height: parent.height
-
-                                    visible: false
-                                    sourceItem: wholeScreen
-                                    sourceRect: Qt.rect(musicPopup.x, musicPopup.y, width, height)
-                                }
-
-                                FastBlur{
-                                    id:fastBlur
-
-                                    anchors.fill: parent
-
-                                    source: footerBlur
-                                    radius: 72
-                                    cached: true
-                                    visible: false
-                                }
-
-                                Rectangle{
-                                    id:maskRect
-
-                                    anchors.fill:fastBlur
-
-                                    visible: false
-                                    clip: true
-                                    radius: 18
-                                }
-                                OpacityMask{
-                                    id:mask
-
-                                    anchors.fill: maskRect
-
-                                    visible: true
-                                    source: fastBlur
-                                    maskSource: maskRect
-                                    
-                                }
-
-                                Rectangle{
-                                    anchors.fill: footerBlur
-
-                                    color: "#CCF7F7F7"
-                                    radius: 18
-                                }
-                            }
-
-                            MenuItem//批量编辑
-                            {
-                                id: videoBatButton
-
-                                width: parent.width
-                                height: musicPopup.height / 3
-                                
-                                background: Rectangle
-                                {
-                                    color:
-                                    {
-                                        if(videoBatButton.hovered)
-                                        {
-                                            "#29787880"
-                                        }else{
-                                            "#00000000"
-                                        }
-                                    }
-                                    radius: 18
-                                }
-
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: wholeScreen.width / 48
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    text: "Batch editing"
-                                    font.pointSize: theme.defaultFont.pointSize + 2
-                                    color: "#FF000000"
-                                }
-
-                                Image
-                                {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: wholeScreen.width / 48
-
-                                    width: wholeScreen.height / 37.5
-                                    height: wholeScreen.height / 37.5
-
-                                    source: "assets/popupDialog/bat_edit.png"
-                                }
-
-                                MouseArea
-                                {
-                                    anchors.fill: parent
-                                    onClicked:
-                                    {
-                                        musicSelectionMode = true
-                                        _selectionBar.clear()
-                                        selectCountText.text = _selectionBar.items.length
-                                        musicPopup.close()
-                                    }
-                                }
-                            }
-
-                            
-                            MenuItem//单独存储
-                            {
-                                id: videoSaveButton
-
-                                anchors.top: videoBatButton.bottom
-
-                                width: parent.width
-                                height: musicPopup.height / 3
-
-                                background: Rectangle
-                                {
-                                    color: {
-                                        if(videoSaveButton.hovered)
-                                        {
-                                            "#29787880"
-                                        }else{
-                                            "#00000000"
-                                        }
-                                    }
-                                }
-                                
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: wholeScreen.width / 48
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    text: "Save to file"
-                                    font.pointSize: theme.defaultFont.pointSize + 2
-                                    color: "#FF8E8E93"
-                                }
-
-                                Image
-                                {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: wholeScreen.width / 48
-
-                                    width: wholeScreen.height / 37.5
-                                    height: wholeScreen.height / 37.5
-
-                                    source: "assets/save.png"
-                                }
-
-                                MouseArea
-                                {
-                                    anchors.fill: parent
-                                    onClicked:{}
-                                }
-                            }
-
-                            MenuItem//单独删除
-                            {
-                                id: videoDeleteButton
-
-                                anchors.top: videoSaveButton.bottom
-
-                                width: parent.width
-                                height: musicPopup.height / 3
-
-                                background: Rectangle
-                                {
-                                    color:
-                                    {
-                                        if(videoDeleteButton.hovered)
-                                        {
-                                            "#29787880"
-                                        }else{
-                                            "#00000000"
-                                        }
-                                    }
-                                    radius: 18
-                                }
-                                
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: wholeScreen.width / 48
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    text: "Delete"
-                                    font.pointSize: theme.defaultFont.pointSize + 2
-                                    color: "#FF000000"
-                                }
-
-                                Image
-                                {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: wholeScreen.width / 48
-
-                                    width: wholeScreen.height / 37.5
-                                    height: wholeScreen.height / 37.5
-
-                                    source: "assets/popupDialog/delete.png"
-                                }
-
-                                MouseArea
-                                {
-                                    anchors.fill: parent
-                                    onClicked:
-                                    {
-                                        jDialogType = 6
-                                        jDialog.open()
-                                        musicPopup.close()
-                                    }
-                                }
-                            }
                         }
 
                         Connections
@@ -1823,7 +1766,7 @@ Kirigami.ApplicationWindow
                             anchors.fill: parent
 
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
-                            radius: 18
+                            radius: 9
                             onPressAndHold:
                             {
                                 if(!musicSelectionMode)
@@ -1912,7 +1855,11 @@ Kirigami.ApplicationWindow
                         target: Vvave.Vvave
                         onRefreshTables: 
                         {
-                            setCurrentPage(currentPage, true)
+                            // setCurrentPage(currentPage, true)
+                            if(currentPage == 1)
+                            {
+                                videoGridView.model.list.query = Q.GET.allVideos
+                            }
                         }
                     }
                 }
@@ -1927,9 +1874,9 @@ Kirigami.ApplicationWindow
                         height: width / 16 * 10
 
                         property bool checked
-                        checked: selectionBar.contains(model.url)
+                        checked: false//selectionBar.contains(model.url)
                         color: "#00000000"
-                        radius: 15
+                        radius: 8
 
                         Rectangle{ 
                             id:imageRect
@@ -1940,7 +1887,7 @@ Kirigami.ApplicationWindow
                             width: wapper.width
                             height: width / 16 * 9
 
-                            radius: 15
+                            radius: 8
 
                             Image {
                                 id:theimage
@@ -1965,7 +1912,7 @@ Kirigami.ApplicationWindow
 
                                 anchors.fill: parent
 
-                                radius: 15
+                                radius: 8
                                 visible: false
                             }
 
@@ -1981,7 +1928,7 @@ Kirigami.ApplicationWindow
                                 anchors.fill: parent
 
                                 acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                radius: 15
+                                radius: 10
 
                                 onPressAndHold:
                                 {
@@ -1991,7 +1938,6 @@ Kirigami.ApplicationWindow
                                         var test = mapToItem(wholeScreen, mouse.x, mouse.y)
                                         videoPopup.popup(wholeScreen, test.x, test.y)
                                     }
-                
                                 }
 
                                 onClicked:
@@ -2036,24 +1982,24 @@ Kirigami.ApplicationWindow
 
                             width: parent.width - wholeScreen.width / 192
 
-                            font.pointSize: theme.defaultFont.pointSize
+                            font.pixelSize: 14
                             text: model.title
                             color: "#FF000000"
                             lineHeight: 1//0.7显小
-                            wrapMode: Text.WordWrap
+                            wrapMode: Text.WrapAnywhere //WordWrap
                             elide: Text.ElideRight
+                            maximumLineCount: 2
                         }
 
                         Image {
                             id:playIcon
 
                             anchors.bottom: imageRect.bottom
-                            anchors.bottomMargin: wholeScreen.height / 92.31
+                            anchors.bottomMargin: 6
                             anchors.left: imageRect.left
-                            anchors.leftMargin: wholeScreen.width / 128
-
-                            width: wholeScreen.height / 33.33
-                            height: wholeScreen.height / 33.33
+                            anchors.leftMargin: 6
+                            width: 18
+                            height: 18
                             
                             source: "assets/video_mode_icon.png"
                             visible: !videoSelectionMode
@@ -2063,12 +2009,12 @@ Kirigami.ApplicationWindow
                             id: duration
 
                             anchors.right: imageRect.right
-                            anchors.rightMargin: wholeScreen.width / 128
+                            anchors.rightMargin: 6//wholeScreen.width / 128
                             anchors.bottom: imageRect.bottom
-                            anchors.bottomMargin: wholeScreen.height / 70.59
+                            anchors.bottomMargin: 6//wholeScreen.height / 70.59
 
                             text: player.transformTime(model.duration) 
-                            font.pointSize: theme.defaultFont.pointSize - 3
+                            font.pixelSize: 11
                             color: "#E6FFFFFF"
                             visible: !videoSelectionMode
                         }
@@ -2078,12 +2024,12 @@ Kirigami.ApplicationWindow
                             id: checkStatusImage
 
                             anchors.right: parent.right
-                            anchors.rightMargin: wholeScreen.width / 192
+                            anchors.rightMargin: 9
                             anchors.bottom: imageRect.bottom
                             anchors.bottomMargin: wholeScreen.width / 192
 
-                            width: wholeScreen.width / 43.63
-                            height: wholeScreen.width / 43.63
+                            width: 22
+                            height: 22
 
                             cache: false
                             source: 
@@ -2108,239 +2054,6 @@ Kirigami.ApplicationWindow
                             }
                         }
 
-                        Menu 
-                        {
-                            id: videoPopup
-
-                            parent: Overlay.overlay
-
-                            width: wholeScreen.width / 4.8
-                            height: wholeScreen.height / 4.44
-
-                            modal: false
-                            focus: true
-                            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-                            background: Rectangle
-                            {
-                                radius: 18
-
-                                ShaderEffectSource
-                                {
-                                    id: footerBlur
-
-                                    width: parent.width
-                                    height: parent.height
-
-                                    visible: false
-                                    
-                                    sourceItem: wholeScreen
-                                    sourceRect: Qt.rect(videoPopup.x, videoPopup.y, width, height)
-                                }
-
-                                FastBlur{
-                                    id:fastBlur
-
-                                    anchors.fill: parent
-
-                                    source: footerBlur
-                                    radius: 72//128
-                                    cached: true
-                                    visible: false
-                                }
-                                Rectangle{
-                                    id:maskRect
-
-                                    anchors.fill:fastBlur
-
-                                    visible: false
-                                    clip: true
-                                    radius: 18
-                                }
-                                OpacityMask{
-                                    id:mask
-
-                                    anchors.fill: maskRect
-
-                                    visible: true
-                                    source: fastBlur
-                                    maskSource: maskRect
-                                }
-
-                                Rectangle{
-                                    anchors.fill: footerBlur
-
-                                    color: "#CCF7F7F7"
-                                    radius: 18
-                                }
-                            }
-
-                            MenuItem//批量编辑
-                            {
-                                id: videoBatButton
-
-                                width: parent.width
-                                height: videoPopup.height / 3
-
-                                background: Rectangle
-                                {
-                                    color:
-                                    {
-                                        if(videoBatButton.hovered)
-                                        {
-                                            "#29787880"
-                                        }else{
-                                            "#00000000"
-                                        }
-                                    }
-                                    radius: 18
-                                }
-
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: wholeScreen.width / 48
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    text: "Batch editing"
-                                    font.pointSize: theme.defaultFont.pointSize + 2
-                                    color: "#FF000000"
-                                }
-
-                                Image
-                                {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: wholeScreen.width / 48
-
-                                    width: 32
-                                    height: 32
-
-                                    source: "assets/popupDialog/bat_edit.png"
-                                }
-
-                                MouseArea
-                                {
-                                    anchors.fill: parent
-                                    onClicked:
-                                    {
-                                        videoSelectionMode = true
-                                        _selectionBar.clear()
-                                        selectCountText.text = _selectionBar.items.length
-                                        videoPopup.close()
-                                    }
-                                }
-                            }
-                            
-                            MenuItem//单独存储
-                            {
-                                id: videoSaveButton
-
-                                anchors.top: videoBatButton.bottom
-
-                                width: parent.width
-                                height: videoPopup.height / 3
-
-                                background: Rectangle
-                                {
-                                    color:
-                                    {
-                                        if(videoSaveButton.hovered)
-                                        {
-                                            "#29787880"
-                                        }else{
-                                            "#00000000"
-                                        }
-                                    }
-                                }
-                                
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: wholeScreen.width / 48
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    text: "Save to file"
-                                    font.pointSize: theme.defaultFont.pointSize + 2
-                                    color: "#FF8E8E93"
-                                }
-
-                                Image
-                                {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: wholeScreen.width / 48
-
-                                    width: wholeScreen.height / 37.5
-                                    height: wholeScreen.height / 37.5
-
-                                    source: "assets/save.png"
-                                }
-
-                                MouseArea
-                                {
-                                    anchors.fill: parent
-                                    onClicked:{}
-                                }
-                            }
-
-                            MenuItem//单独删除
-                            {
-                                id: videoDeleteButton
-
-                                anchors.top: videoSaveButton.bottom
-
-                                width: parent.width
-                                height: videoPopup.height / 3
-
-                                background: Rectangle
-                                {
-                                    color:
-                                    {
-                                        if(videoDeleteButton.hovered)
-                                        {
-                                            "#29787880"
-                                        }else{
-                                            "#00000000"
-                                        }
-                                    }
-                                    radius: 18
-                                }
-                                
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: wholeScreen.width / 48
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    text: "Delete"
-                                    font.pointSize: theme.defaultFont.pointSize + 2
-                                    color: "#FF000000"
-                                }
-
-                                Image
-                                {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: wholeScreen.width / 48
-
-                                    width: wholeScreen.height / 37.5
-                                    height: wholeScreen.height / 37.5
-
-                                    source: "assets/popupDialog/delete.png"
-                                }
-
-                                MouseArea
-                                {
-                                    anchors.fill: parent
-
-                                    onClicked:
-                                    {
-                                        jDialogType = 2
-                                        jDialog.open()
-                                        videoPopup.close()
-                                    }
-                                }
-                            }
-                        }
-
                         Connections
                         {
                             target: _selectionBar
@@ -2361,6 +2074,75 @@ Kirigami.ApplicationWindow
                         }
                     }
                 }
+
+                Item//空页面UI
+                {
+                    id: emptyRect
+
+                    anchors.top: contentTitle.bottom
+                    anchors.topMargin: wholeScreen.height / 48
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right   
+
+                    width: parent.width
+                    height: parent.height 
+
+                    visible: false
+
+                    Image
+                    {
+                        id: emptyIcon
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 310//(572 + 120) / 2 
+
+                        width: 60
+                        height: width
+
+                        source: 
+                        {
+                            if(noResultState)
+                            {
+                                "assets/search_empty.png"
+                            }else
+                            {
+                                if(currentPage <= 3)
+                                {
+                                    "assets/video_empty.png"
+                                }else
+                                {
+                                    "assets/music_empty.png"
+                                }
+                            }
+                        }
+                    }
+
+                    Text {
+                        anchors.top: emptyIcon.bottom
+                        anchors.topMargin: 15
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        font.pixelSize: 14
+                        text:
+                        {
+                            if(noResultState)
+                            {
+                                i18n("Sorry,there are no search results.")
+                            }else
+                            {
+                                if(currentPage <= 3)
+                                {
+                                    i18n("There is no video at present")
+                                }else
+                                {
+                                    i18n("There is no music at present")
+                                }
+                            }
+                        }
+                        color: "#4D3C3C43"
+                    }
+                }
             }
         }
     }
@@ -2372,7 +2154,7 @@ Kirigami.ApplicationWindow
         anchors.bottom: wholeScreen.bottom
 
         width: wholeScreen.width
-        height: wholeScreen.height / 7.41
+        height: 81//wholeScreen.height / 7.41
 
         color: "#00000000"
         visible: 
@@ -2388,16 +2170,19 @@ Kirigami.ApplicationWindow
         
         Rectangle
         {
-            width: wholeScreen.width
-            height: wholeScreen.height / 7.41
+            width: parent.width//wholeScreen.width
+            height: parent.height//wholeScreen.height / 7.41
 
             color: "#00000000"
 
-            MouseArea
+            MouseArea//被播放器遮住item还可以响应右键菜单 hover效果 点击等鼠标操作 这里直接拦截掉 以避免这个问题
             {
                 anchors.fill: parent
-
                 hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: 
+                {
+                }
             }
 
             ShaderEffectSource
@@ -2449,13 +2234,13 @@ Kirigami.ApplicationWindow
                 id:currentIcon
 
                 anchors.left: parent.left
-                anchors.leftMargin: wholeScreen.width / 50.53
+                anchors.leftMargin: 14//wholeScreen.width / 50.53
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.height / 14.29
-                height: wholeScreen.height / 14.29
+                width: 56//wholeScreen.height / 14.29
+                height: 56//wholeScreen.height / 14.29
 
-                radius: 8
+                radius: 4
 
                 Image {
                     id: currentCoverImage
@@ -2471,7 +2256,7 @@ Kirigami.ApplicationWindow
 
                     anchors.fill: parent
 
-                    radius: 8
+                    radius: 4
                     visible: false
                 }
 
@@ -2491,8 +2276,8 @@ Kirigami.ApplicationWindow
                 anchors.left: currentIcon.right
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.width / 80
-                height: wholeScreen.height / 14.29
+                width: 15//wholeScreen.width / 80
+                height: currentIcon.height//wholeScreen.height / 14.29
 
                 source: "assets/play_right.png"
             }
@@ -2501,13 +2286,13 @@ Kirigami.ApplicationWindow
                 id:currentName
 
                 anchors.left: play_right.right
-                anchors.leftMargin: wholeScreen.width / 80
+                anchors.leftMargin: 16//wholeScreen.width / 80
                 anchors.top: parent.top
                 anchors.topMargin: wholeScreen.height / 30
 
-                width: wholeScreen.width / 6.62
+                width: 145//wholeScreen.width / 6.62
 
-                font.pointSize: theme.defaultFont.pointSize + 2
+                font.pixelSize: 17
                 text: currentTrack ? currentTrack.title : ""
                 color: "#FF000000"
                 elide: Text.ElideRight
@@ -2517,14 +2302,32 @@ Kirigami.ApplicationWindow
                 id:currentAlbum
 
                 anchors.left: play_right.right
-                anchors.leftMargin: wholeScreen.width / 80
+                anchors.leftMargin: 16//wholeScreen.width / 80
                 anchors.top: currentName.bottom
                 anchors.topMargin: wholeScreen.height / 200
 
-                width: wholeScreen.width / 6.62
+                width: 145//wholeScreen.width / 6.62
 
-                text: currentTrack ? (currentTrack.artist + " · 《" + currentTrack.album + "》") : ""
-                font.pointSize: theme.defaultFont.pointSize - 5
+                text: //currentTrack ? (currentTrack.artist + " · 《" + currentTrack.album + "》") : ""
+                {
+                    if(currentTrack)
+                    {
+                        if(currentTrack.artist == "UNKNOWN" && currentTrack.album == "UNKNOWN")
+                        {
+                            i18n(currentTrack.artist)
+                        }else if(currentTrack.artist != "UNKNOWN" && currentTrack.album == "UNKNOWN")
+                        {
+                            i18n(currentTrack.artist)
+                        }else if(currentTrack.artist == "UNKNOWN" && currentTrack.album != "UNKNOWN")
+                        {
+                            "《" + i18n(currentTrack.album) + "》"
+                        }else
+                        {
+                            i18n(currentTrack.artist) + " · 《" + i18n(currentTrack.album) + "》"
+                        }
+                    }
+                }
+                font.pixelSize: 11
                 color: "#99000000"
                 elide: Text.ElideRight
             }
@@ -2534,11 +2337,11 @@ Kirigami.ApplicationWindow
                 id: currentType
 
                 anchors.left: currentName.right
-                anchors.leftMargin: wholeScreen.width / 28.23
+                anchors.leftMargin: 30//wholeScreen.width / 28.23 / 2
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.width / 43.63 + wholeScreen.height / 120
-                height: wholeScreen.width / 43.63 + wholeScreen.height / 120
+                width: 22 + 10
+                height: 22 + 10
 
                 source:
                 {
@@ -2553,9 +2356,6 @@ Kirigami.ApplicationWindow
                     }
                 }
                 
-                MouseArea 
-                {
-                    anchors.fill: parent
 
                     onClicked: 
                     {
@@ -2566,7 +2366,6 @@ Kirigami.ApplicationWindow
                         }
                         Maui.FM.saveSettings("SHUFFLE", playType, "PLAYBACK")
                     }
-                }
 
                 Component.onCompleted:
                 {
@@ -2579,17 +2378,14 @@ Kirigami.ApplicationWindow
                 id: currentFav
 
                 anchors.left: currentType.right
-                anchors.leftMargin: wholeScreen.width / 32
+                anchors.leftMargin: 30
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.width / 43.63 + wholeScreen.height / 120
-                height: wholeScreen.width / 43.63 + wholeScreen.height / 120
+                width: 22 + 10
+                height: 22 + 10
 
                 source: fav ? "qrc:/assets/fav.png" : "qrc:/assets/unfav.png"
-                
-                MouseArea 
-                {
-                    anchors.fill: parent
+
                     onClicked: 
                     {
                         if (!mainlistEmpty)
@@ -2602,7 +2398,6 @@ Kirigami.ApplicationWindow
                             }
                         }
                     }
-                }
             }
 
             Rectangle//播放进度条
@@ -2610,10 +2405,11 @@ Kirigami.ApplicationWindow
                 id: currentTime
 
                 anchors.left: currentFav.right
-                anchors.leftMargin: wholeScreen.width / 32
+                anchors.leftMargin: 30//wholeScreen.width / 32
                 
-                width: wholeScreen.width / 3.01 + wholeScreen.width / 73.85 + wholeScreen.width / 16 - wholeScreen.width / 40.85
-                height: wholeScreen.height / 7.41
+                
+                width: wholeScreen.width / 2.96//300//wholeScreen.width / 3.01 + wholeScreen.width / 73.85 + wholeScreen.width / 16 - wholeScreen.width / 40.85 //260
+                height: parent.height//wholeScreen.height / 7.41
 
                 color: "#00000000"
                 
@@ -2631,6 +2427,8 @@ Kirigami.ApplicationWindow
                     {
                         id: progressBar
 
+                        property bool seekStarted: false
+
                         anchors.verticalCenter: parent.verticalCenter
 
                         width: currentTime.width - _label2.width - wholeScreen.width / 38.4
@@ -2638,11 +2436,11 @@ Kirigami.ApplicationWindow
                         z: parent.z + 1
                         from: 0
                         to: 1000
-                        value: player.pos
+                        // value: player.pos
                         spacing: 0
                         focus: true
-                        onMoved: player.pos = value
-                        enabled: player.playing
+                        // onMoved: player.pos = value
+                        enabled: true//player.playing
                         
                         handle: Rectangle//选中拖动时候的效果
                         {
@@ -2660,14 +2458,14 @@ Kirigami.ApplicationWindow
                             {
                                 "#FFFFFFFF"
                             }
-                            radius: 8
+                            radius: 4
                         }
 
                         DropShadow
                         {
                             anchors.fill: handleRect
 
-                            radius: 8
+                            radius: 4
                             samples: 16
                             color: "#50000000"
                             source: handleRect
@@ -2697,6 +2495,24 @@ Kirigami.ApplicationWindow
                                 radius: 2
                             }
                         }
+
+                        onPressedChanged: {
+                            if (pressed) {
+                                progressBar.seekStarted = true
+                            } else {
+                                player.pos = progressBar.value
+                                progressBar.seekStarted = false
+                            }
+                        }
+
+                        Connections {
+                            target: player
+                            onPosChanged: {
+                                if (!progressBar.seekStarted) {
+                                    progressBar.value = player.pos
+                                }
+                            }
+                        }
                     }
 
                     Text//播放时间
@@ -2712,7 +2528,7 @@ Kirigami.ApplicationWindow
                         wrapMode: Text.NoWrap
                         color: "#FF8E8E93"
                         font.weight: Font.Normal
-                        font.pointSize: theme.defaultFont.pointSize - 3
+                        font.pixelSize: 11
                         opacity: 0.7
                         
                         Component.onCompleted: {
@@ -2728,23 +2544,19 @@ Kirigami.ApplicationWindow
                 id: previousImage
 
                 anchors.left: currentTime.right
-                anchors.leftMargin: wholeScreen.width / 27.43
+                anchors.leftMargin: 30//wholeScreen.width / 27.43
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.width / 43.63 + wholeScreen.height / 120
-                height: wholeScreen.width / 43.63 + wholeScreen.height / 120
+                width: 22 + 10
+                height: 22 + 10
 
                 source: "qrc:/assets/previousTrack.png"
 
-                MouseArea 
-                {
-                    anchors.fill: parent
                     onClicked: 
                     {
                         Player.previousTrack()
                         isFav()
                     }
-                }
             }
 
             Kirigami.JIconButton//播放 暂停
@@ -2752,22 +2564,18 @@ Kirigami.ApplicationWindow
                 id: playImage
 
                 anchors.left: previousImage.right
-                anchors.leftMargin: wholeScreen.width / 29.09
+                anchors.leftMargin: 30//wholeScreen.width / 29.09
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.height / 20 + wholeScreen.height / 120
-                height: wholeScreen.height / 20 + wholeScreen.height / 120
+                width: 30 + 10
+                height: 30 + 10
                 source: isPlaying ? "qrc:/assets/pause.png" : "qrc:/assets/play.png" 
                 
-                MouseArea 
-                {
-                    anchors.fill: parent
 
-                    onClicked: 
-                    {
-                        player.playing = !player.playing
-                        musicGridView.model.list.emitpPlayingState(player.playing)
-                    }
+                onClicked: 
+                {
+                    player.playing = !player.playing
+                    musicGridView.model.list.emitpPlayingState(player.playing)
                 }
             }
             
@@ -2776,23 +2584,18 @@ Kirigami.ApplicationWindow
                 id: nextTrackImage
 
                 anchors.left: playImage.right
-                anchors.leftMargin: wholeScreen.width / 29.09
+                anchors.leftMargin: 30//wholeScreen.width / 29.09
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: wholeScreen.width / 43.63 + wholeScreen.height / 120
-                height: wholeScreen.width / 43.63 + wholeScreen.height / 120
+                width: 22 + 10
+                height: 22 + 10
 
                 source: "qrc:/assets/nextTrack.png"
                 
-                MouseArea 
+                onClicked: 
                 {
-                    anchors.fill: parent
-
-                    onClicked: 
-                    {
-                        Player.nextTrack(false)
-                        isFav()
-                    }
+                    Player.nextTrack(false)
+                    isFav()
                 }
             }
 
@@ -2815,15 +2618,6 @@ Kirigami.ApplicationWindow
         }
     }
     
-    Component.onCompleted:
-    {
-        if(isAndroid)
-        {
-            Maui.Android.statusbarColor(Kirigami.Theme.backgroundColor, true)
-            Maui.Android.navBarColor(Kirigami.Theme.backgroundColor, true)
-        }
-    }
-
     property string playlistQuery
 
     function populate(query, isPublic)
@@ -2956,8 +2750,29 @@ Kirigami.ApplicationWindow
         }
         searchRect.clear()
         filterStatus = ""
-        searchResultText.visible = false
+        noResultState = false
         cancelEdit()
+
+    
+        if(currentPage <= 3)
+        {
+            if(videoGridView.model.getAll().length == 0)
+            {
+                emptyRect.visible = true
+            }else
+            {
+                emptyRect.visible = false
+            }
+        }else
+        {
+            if(musicGridView.model.getAll().length == 0)
+            {
+                emptyRect.visible = true
+            }else
+            {
+                emptyRect.visible = false
+            }
+        }
     }
 
     //for dbus start
@@ -2982,6 +2797,60 @@ Kirigami.ApplicationWindow
         Player.previousTrack()
         isFav()
     }
-    //for dbug end
+    //for dbus end
+
+    //编辑态多选 start
+    function addToSelection(item, index)
+    {
+        if(_selectionBar == null)
+        {
+            return
+        }
+
+        if(_selectionBar.contains(item.url))
+        {
+            _selectionBar.removeAtUri(item.url)
+            return
+        }
+
+        _selectionBar.append(item.url, item)
+    }
+
+    function selectAll(type)
+    {
+        if(_selectionBar == null)
+        {
+            return
+        }
+
+        if(type == 1)//视频
+        {
+            selectIndexes([...Array(videoGridView.model.getAll().length).keys()], type)
+        }else if(type == 2)//音频
+        {
+            selectIndexes([...Array(musicGridView.model.getAll().length).keys()], type)
+        }
+    }
+
+    function selectIndexes(indexes, type)
+    {
+        if(_selectionBar == null)
+        {
+            return
+        }
+
+        if(type == 1)//视频
+        {
+            for(var i in indexes)
+                addToSelection(videoGridView.model.get(indexes[i]), i)
+        }else if(type == 2)//音频
+        {
+            for(var i in indexes)
+                addToSelection(musicGridView.model.get(indexes[i]), i)
+        }
+
+    }
+
+    //编辑态多选 end
 
 }

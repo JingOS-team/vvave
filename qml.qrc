@@ -6,6 +6,7 @@
         <file>view_models/BabeTable/BabeTable.qml</file>
         <file>widgets/MainPlaylist/MainPlaylist.qml</file>
         <file>widgets/SelectionBar.qml</file>
+        <file>widgets/SelectionBar1.qml</file>
         <file>view_models/BabeList.qml</file>
 
 
@@ -150,6 +151,10 @@
         <!-- popup start -->
 
         <file>assets/back_arrow.png</file>
+        <file>assets/playing.gif</file>
+        <file>assets/music_empty.png</file>
+        <file>assets/video_empty.png</file>
+        <file>assets/search_empty.png</file>
 
     </qresource>
     <qresource prefix="/DB">

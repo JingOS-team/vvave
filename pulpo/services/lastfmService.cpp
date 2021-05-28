@@ -3,7 +3,7 @@
 using namespace PULPO;
 
 lastfm::lastfm()
-{
+{    
     this->scope.insert(ONTOLOGY::ALBUM, {INFO::ARTWORK, INFO::WIKI, INFO::TAGS});
     this->scope.insert(ONTOLOGY::ARTIST, {INFO::ARTWORK, INFO::WIKI, INFO::TAGS});
     this->scope.insert(ONTOLOGY::TRACK, {INFO::TAGS, INFO::WIKI, INFO::ARTWORK, INFO::METADATA});
@@ -32,40 +32,40 @@ void lastfm::set(const PULPO::REQUEST &request)
     QUrl encodedArtist(this->request.track[FMH::MODEL_KEY::ARTIST]);
     encodedArtist.toEncoded(QUrl::FullyEncoded);
 
-    switch (this->request.ontology)
+    switch(this->request.ontology)
     {
-    case PULPO::ONTOLOGY::ARTIST:
-    {
-        url.append("?method=artist.getinfo");
-        url.append(KEY);
-        url.append("&artist=" + encodedArtist.toString());
-        break;
-    }
+        case PULPO::ONTOLOGY::ARTIST:
+        {
+            url.append("?method=artist.getinfo");
+            url.append(KEY);
+            url.append("&artist=" + encodedArtist.toString());
+            break;
+        }
 
-    case PULPO::ONTOLOGY::ALBUM:
-    {
-        QUrl encodedAlbum(this->request.track[FMH::MODEL_KEY::ALBUM]);
-        encodedAlbum.toEncoded(QUrl::FullyEncoded);
+        case PULPO::ONTOLOGY::ALBUM:
+        {
+            QUrl encodedAlbum(this->request.track[FMH::MODEL_KEY::ALBUM]);
+            encodedAlbum.toEncoded(QUrl::FullyEncoded);
 
-        url.append("?method=album.getinfo");
-        url.append(KEY);
-        url.append("&artist=" + encodedArtist.toString());
-        url.append("&album=" + encodedAlbum.toString());
-        break;
-    }
+            url.append("?method=album.getinfo");
+            url.append(KEY);
+            url.append("&artist=" + encodedArtist.toString());
+            url.append("&album=" + encodedAlbum.toString());
+            break;
+        }
 
-    case PULPO::ONTOLOGY::TRACK:
-    {
-        QUrl encodedTrack(this->request.track[FMH::MODEL_KEY::TITLE]);
-        encodedTrack.toEncoded(QUrl::FullyEncoded);
+        case PULPO::ONTOLOGY::TRACK:
+        {
+            QUrl encodedTrack(this->request.track[FMH::MODEL_KEY::TITLE]);
+            encodedTrack.toEncoded(QUrl::FullyEncoded);
 
-        url.append("?method=track.getinfo");
-        url.append(KEY);
-        url.append("&artist=" + encodedArtist.toString());
-        url.append("&track=" + encodedTrack.toString());
-        url.append("&format=json");
-        break;
-    }
+            url.append("?method=track.getinfo");
+            url.append(KEY);
+            url.append("&artist=" + encodedArtist.toString());
+            url.append("&track=" + encodedTrack.toString());
+            url.append("&format=json");
+            break;
+        }
     }
 
     qDebug()<< "[lastfm service]: "<< url;
@@ -110,9 +110,9 @@ void lastfm::parseArtist(const QByteArray &array)
         if (n.isElement())
         {
             //Here retrieve the artist image
-            if (n.nodeName() == "image" && n.hasAttributes())
+            if(n.nodeName() == "image" && n.hasAttributes())
             {
-                if (this->request.info.contains(INFO::ARTWORK))
+                if(this->request.info.contains(INFO::ARTWORK))
                 {
                     const auto imgSize = n.attributes().namedItem("size").nodeValue();
                     if (imgSize == "large" && n.isElement())
@@ -120,12 +120,12 @@ void lastfm::parseArtist(const QByteArray &array)
                         const auto artistArt_url = n.toElement().text();
                         this->responses << PULPO::RESPONSE {CONTEXT::IMAGE, artistArt_url};
 
-                        if (this->request.info.size() == 1) break;
+                        if(this->request.info.size() == 1) break;
                         else continue;
 
-                    } else continue;
+                    }else continue;
 
-                } else continue;
+                }else continue;
             }
         }
     }
@@ -256,9 +256,9 @@ void lastfm::parseAlbum(const QByteArray &array)
         if (n.isElement())
         {
             //Here retrieve the artist image
-            if (n.nodeName() == "image" && n.hasAttributes())
+            if(n.nodeName() == "image" && n.hasAttributes())
             {
-                if (this->request.info.contains(INFO::ARTWORK))
+                if(this->request.info.contains(INFO::ARTWORK))
                 {
                     const auto imgSize = n.attributes().namedItem("size").nodeValue();
 
@@ -267,36 +267,36 @@ void lastfm::parseAlbum(const QByteArray &array)
                         const auto albumArt_url = n.toElement().text();
                         this->responses << PULPO::RESPONSE {CONTEXT::IMAGE, albumArt_url};
 
-                        if (this->request.info.size() == 1) break;
+                        if(this->request.info.size() == 1) break;
                         else continue;
 
-                    } else continue;
+                    }else continue;
 
-                } else continue;
+                }else continue;
             }
 
             if (n.nodeName() == "wiki")
             {
-                if (this->request.info.contains(INFO::WIKI))
+                if(this->request.info.contains(INFO::WIKI))
                 {
-                    const auto albumWiki = n.childNodes().item(1).toElement().text();
+                   const auto albumWiki = n.childNodes().item(1).toElement().text();
                     //qDebug()<<"Fetching AlbumWiki LastFm[]";
 
                     this->responses << PULPO::RESPONSE {CONTEXT::WIKI, albumWiki};
 
-                    if (this->request.info.size() == 1) break;
+                    if(this->request.info.size() == 1) break;
                     else continue;
 
-                } else continue;
+                }else continue;
             }
 
             if (n.nodeName() == "tags")
             {
-                if (this->request.info.contains(INFO::TAGS))
+                if(this->request.info.contains(INFO::TAGS))
                 {
                     auto tagsList = n.toElement().childNodes();
                     QStringList albumTags;
-                    for (int i=0; i<tagsList.count(); i++)
+                    for(int i=0; i<tagsList.count(); i++)
                     {
                         QDomNode m = tagsList.item(i);
                         albumTags<<m.childNodes().item(0).toElement().text();
@@ -304,10 +304,10 @@ void lastfm::parseAlbum(const QByteArray &array)
 
                     this->responses << PULPO::RESPONSE {CONTEXT::TAG, albumTags};
 
-                    if (this->request.info.size() == 1) break;
+                    if(this->request.info.size() == 1) break;
                     else continue;
 
-                } else continue;
+                }else continue;
             }
         }
     }

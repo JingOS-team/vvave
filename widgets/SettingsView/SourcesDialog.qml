@@ -30,7 +30,7 @@ Maui.Dialog
 
     onAccepted:
     {
-        _dialogLoader.sourceComponent = _fmDialogComponent
+        // _dialogLoader.sourceComponent = _fmDialogComponent
         root.dialog.settings.onlyDirs = true
         root.dialog.show(function(paths)
         {

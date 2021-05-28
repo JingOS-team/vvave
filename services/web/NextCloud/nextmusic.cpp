@@ -17,7 +17,7 @@
 
 static const inline QNetworkRequest formRequest(const QUrl &url, const  QString &user, const QString &password)
 {
-    if (!url.isValid() && !user.isEmpty() && !password.isEmpty())
+    if(!url.isValid() && !user.isEmpty() && !password.isEmpty())
         return QNetworkRequest();
 
     const QString concatenated =  QString("%1:%2").arg(user, password);
@@ -67,15 +67,15 @@ FMH::MODEL_LIST NextMusic::parseCollection(const QByteArray &array)
 
     const auto data = jsonResponse.toVariant();
 
-    if (data.isNull() || !data.isValid())
+    if(data.isNull() || !data.isValid())
         return res;
 
     const auto list = data.toList();
     qDebug()<< "SOFAR GOOD PARSING";
 
-    if (!list.isEmpty())
+    if(!list.isEmpty())
     {
-        for (const auto &item : list)
+        for(const auto &item : list)
         {
             const auto map = item.toMap();
             const auto artist = map.value("name").toString();
@@ -86,7 +86,7 @@ FMH::MODEL_LIST NextMusic::parseCollection(const QByteArray &array)
             qDebug()<< "ARTIST" << artist << artistId;
 
             const auto albumsList = map.value("albums").toList();
-            for (const auto &albumItem : albumsList)
+            for(const auto &albumItem : albumsList)
             {
                 const auto albumMap = albumItem.toMap();
                 const auto album = albumMap.value("name").toString();
@@ -100,7 +100,7 @@ FMH::MODEL_LIST NextMusic::parseCollection(const QByteArray &array)
                 qDebug()<< "ARTIST && ALBUM" << artist << album << artistId;
 
                 const auto tracksList = albumMap.value("tracks").toList();
-                for (const auto &trackItem : tracksList)
+                for(const auto &trackItem : tracksList)
                 {
                     const auto trackMap = trackItem.toMap();
 
@@ -109,21 +109,21 @@ FMH::MODEL_LIST NextMusic::parseCollection(const QByteArray &array)
                     const auto id = trackMap.value("id").toString();
 
                     const auto filesMap = trackMap.value("files").toMap();
-                    for (const auto &fileKey : filesMap.keys())
+                    for(const auto &fileKey : filesMap.keys())
                     {
                         const auto mime = fileKey;
                         const auto url = filesMap[fileKey].toString();
 
                         const auto trackModel = FMH::MODEL({
-                            {FMH::MODEL_KEY::ID, url},
-                            {FMH::MODEL_KEY::TITLE, title},
-                            {FMH::MODEL_KEY::TRACK, track},
-                            {FMH::MODEL_KEY::ALBUM, album},
-                            {FMH::MODEL_KEY::ARTIST, artist},
-                            {FMH::MODEL_KEY::ARTWORK, albumCover},
-                            {FMH::MODEL_KEY::RELEASEDATE, albumYear},
-                            {FMH::MODEL_KEY::SOURCE, this->m_provider}
-                        });
+                                              {FMH::MODEL_KEY::ID, url},
+                                              {FMH::MODEL_KEY::TITLE, title},
+                                              {FMH::MODEL_KEY::TRACK, track},
+                                              {FMH::MODEL_KEY::ALBUM, album},
+                                              {FMH::MODEL_KEY::ARTIST, artist},
+                                              {FMH::MODEL_KEY::ARTWORK, albumCover},
+                                              {FMH::MODEL_KEY::RELEASEDATE, albumYear},
+                                              {FMH::MODEL_KEY::SOURCE, this->m_provider}
+                                          });
 
                         this->m_tracks.insert(url, trackModel);
                         res << trackModel;
@@ -143,7 +143,7 @@ FMH::MODEL NextMusic::getTrackItem(const QString &id)
 }
 
 void NextMusic::getTrackPath(const QString &id)
-{
+{  
     QUrl relativeUrl("../.."+NextMusic::API+QString("file/%1/path").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
 
@@ -167,13 +167,13 @@ void NextMusic::getTrackPath(const QString &id)
 
         const auto data = jsonResponse.toVariant();
 
-        if (data.isNull() || !data.isValid())
+        if(data.isNull() || !data.isValid())
             return;
 
         const auto map = data.toMap();
         auto path = map["path"].toString();
         const auto url = this->provider() + (path.startsWith("/") ? path.remove(0,1) : path);
-        emit this->trackPathReady(id, url);
+       emit this->trackPathReady(id, url);
     });
 
     downloader->getArray(url, header);

@@ -37,12 +37,8 @@ public:
     virtual void getFolders() = 0;
     virtual void getFolder(const QString &id) = 0;
 
-    virtual QVariantList getAlbumsList() const {
-        return QVariantList();
-    }
-    virtual QVariantList getArtistsList() const {
-        return QVariantList();
-    }
+    virtual QVariantList getAlbumsList() const {return QVariantList();}
+    virtual QVariantList getArtistsList() const {return QVariantList();}
     /**
      * @brief setCredentials
      * sets the credential to authenticate to the provider server

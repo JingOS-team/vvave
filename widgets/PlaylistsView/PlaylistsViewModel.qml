@@ -75,6 +75,7 @@ BabeList
         width: control.width
         label: model.playlist
         
+
         Connections
         {
             target : delegate
@@ -126,7 +127,8 @@ BabeList
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         color: Kirigami.Theme.backgroundColor
         
-        ColumnLayout
+
+        ColumnLayout//playlist 上横着布局的选项
         {
            anchors.fill: parent
 
@@ -185,7 +187,6 @@ BabeList
                             switch(currentPlaylist)
                             {
                             case "Most Played":
-                            
                                 populate(Q.GET.mostPlayedTracks, false);
                                 filterList.list.sortBy = Tracks.COUNT
                                 break;

@@ -13,7 +13,7 @@ void Service::set(const PULPO::REQUEST &request)
 
 void Service::parse(const QByteArray &array)
 {
-    switch (this->request.ontology)
+    switch(this->request.ontology)
     {
     case PULPO::ONTOLOGY::ALBUM:
         this->parseAlbum(array);
@@ -29,7 +29,7 @@ void Service::parse(const QByteArray &array)
 
 void Service::retrieve(const QString &url, const QMap<QString, QString> &headers)
 {
-    if (!url.isEmpty())
+    if(!url.isEmpty())
     {
         auto downloader = new FMH::Downloader;
         connect(downloader, &FMH::Downloader::dataReady, [&, _downloader = std::move(downloader)](QByteArray array)

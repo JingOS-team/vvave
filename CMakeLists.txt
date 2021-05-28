@@ -10,6 +10,7 @@ find_package(MauiKit REQUIRED)
 find_package(Qt5 REQUIRED NO_MODULE COMPONENTS Qml Quick Network WebSockets Sql QuickControls2 Xml Multimedia DBus Svg WebView)
 #find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS I18n Notifications Config KIO Attica SyntaxHighlighting KIO)
 find_package(KF5 ${KF5_VERSION} REQUIRED COMPONENTS I18n Notifications Config KIO Attica SyntaxHighlighting FileMetaData KIO)
+find_package(Qt5QuickCompiler) #fast codeing
 include(KDEInstallDirs)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
@@ -26,8 +27,11 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/services/web
     )
 
+qtquick_compiler_add_resources(hjyRec qml.qrc)
+
 add_executable(media
-    qml.qrc
+    # qml.qrc
+    ${hjyRec}
     main.cpp
     vvave.cpp
 #    pulpo/services/geniusService.cpp
@@ -40,6 +44,7 @@ add_executable(media
     pulpo/htmlparser.cpp
     pulpo/service.cpp
     services/local/taginfo.cpp
+    services/local/mediastorage.cpp
     services/local/player.cpp
     services/local/youtubedl.cpp
 #    services/local/linking.cpp
@@ -90,8 +95,13 @@ else()
     target_link_libraries(media Qt5::WebView KF5::ConfigCore KF5::Notifications KF5::KIOCore KF5::I18n Qt5::DBus KF5::Attica KF5::SyntaxHighlighting mediainfo)
 endif()
 
+find_package(KF5I18n CONFIG REQUIRED)
+ki18n_install(po)
+
+find_package(KF5DBusAddons REQUIRED)
+
 target_include_directories(media PRIVATE ${TAGLIB_INCLUDE_DIRS})
-target_link_libraries(media MauiKit Qt5::Network Qt5::Sql Qt5::WebSockets Qt5::Qml Qt5::Xml Qt5::Multimedia  Qt5::QuickControls2 ${TAGLIB_LIBRARIES} KF5::KIOCore KF5::FileMetaData)
+target_link_libraries(media MauiKit Qt5::Network Qt5::Sql Qt5::WebSockets Qt5::Qml Qt5::Xml Qt5::Multimedia  Qt5::QuickControls2 ${TAGLIB_LIBRARIES} KF5::KIOCore KF5::FileMetaData KF5::DBusAddons KF5::CoreAddons)
 #target_link_libraries(media MauiKit Qt5::Network Qt5::Sql Qt5::WebSockets Qt5::Qml Qt5::Xml Qt5::Multimedia  Qt5::QuickControls2 ${TAGLIB_LIBRARIES})
 
 install(TARGETS media ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

@@ -25,7 +25,7 @@ Spotify::~Spotify()
 
 void Spotify::setCode(const QString &code)
 {
-    if (code.isEmpty())
+    if(code.isEmpty())
         this->code = BAE::loadSettings("SPOTIFY_CODE", "VVAVE", "").toString();
     else
     {

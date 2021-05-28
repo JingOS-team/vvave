@@ -95,6 +95,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     db/collectionDB.cpp \
     services/local/taginfo.cpp \
+    services/local/mediastorage.cpp \
     services/local/player.cpp \
     services/web/youtube.cpp \
     vvave.cpp \
@@ -119,6 +120,7 @@ HEADERS += \
     utils/bae.h \
     services/local/fileloader.h \
     services/local/taginfo.h \
+    services/local/mediastorage.h \
     services/local/player.h \
     services/web/youtube.h \
     vvave.h \

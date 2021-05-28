@@ -1,20 +1,3 @@
-/*
-   Babe - tiny music player
-   Copyright 2021 Wang Rui <wangrui@jingos.com>
-
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-*/
-
 var GET = {
 
     allTracks : "select t.*, al.artwork from tracks t inner join albums al on al.album = t.album and al.artist = t.artist",
@@ -30,9 +13,15 @@ var GET = {
     tracksWhere_ : "select t.*, al.artwork from tracks t inner join albums al on al.album = t.album and al.artist = t.artist where %1",
 //    sourceTracks_: "select * from tracks where sources_url = \"%1\"",
 
+    //allVideos : "select t.*, al.artwork from videos t inner join albums al on al.album = t.album and al.artist = t.artist",
     allVideos : "select * from videos",
+    // mostPlayedVideos : "select * from videos where count > 0 ORDER BY count desc LIMIT 100",
     mostPlayedVideos : "select * from videos where count > 0 ORDER BY strftime(\"%s\", releaseDate) desc LIMIT 100",
+    //mostPlayedVideos : "select t.*, al.artwork from videos t inner join albums al on t.album = al.album and t.artist = al.artist WHERE t.count > 0 ORDER BY count desc LIMIT 100",
+
+    // mostPlayedTracks : "select t.*, al.artwork from tracks t inner join albums al on t.album = al.album and t.artist = al.artist WHERE t.count > 0 ORDER BY count desc LIMIT 100",
     mostPlayedTracks : "select t.*, al.artwork from tracks t inner join albums al on t.album = al.album and t.artist = al.artist WHERE t.count > 0 ORDER BY strftime(\"%s\", releaseDate) desc LIMIT 100",
+    
     favoriteTracks : "select t.*, al.artwork from tracks t inner join albums al on t.album = al.album and t.artist = al.artist where rate > 0 order by rate desc limit 100",
     recentTracks: "select t.* , al.artwork from tracks t inner join albums al on t.album = al.album and t.artist = al.artist order by strftime(\"%s\", t.addDate) desc LIMIT 100",
     babedTracks: "#favs",

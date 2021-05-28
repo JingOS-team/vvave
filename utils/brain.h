@@ -28,7 +28,7 @@ public:
     PULPO::REQUEST next()
     {
         index++;
-        if (index < 0 || index >= requests.size())
+        if(index < 0 || index >= requests.size())
             return PULPO::REQUEST{};
 
         const auto res = requests.at(index);
@@ -77,21 +77,21 @@ inline static QUEUE artistArtworks()
 
     qDebug() << ("Getting missing artists artworks");
     auto queryTxt = QString("SELECT %1 FROM %2 WHERE %3 = ''").arg(KEYMAP[KEY::ARTIST],
-                    TABLEMAP[TABLE::ARTISTS], KEYMAP[KEY::ARTWORK]);
+            TABLEMAP[TABLE::ARTISTS], KEYMAP[KEY::ARTWORK]);
 
     auto db = CollectionDB::getInstance();
     auto artworks = db->getDBData(queryTxt);
 
 
     /* BEFORE FETCHING ONLINE LOOK UP IN THE CACHE FOR THE IMAGE */
-    for (auto artist : artworks)
-        if (BAE::artworkCache(artist, FMH::MODEL_KEY::ARTIST))
+    for(auto artist : artworks)
+        if(BAE::artworkCache(artist, FMH::MODEL_KEY::ARTIST))
             db->insertArtwork(artist);
 
     artworks = db->getDBData(queryTxt);
     //    this->setInfo(artworks, ontology, services, PULPO::INFO::ARTWORK, PULPO::RECURSIVE::OFF, nullptr);
     qDebug()<< "MISSING ARTIST IMAGES"<< artworks.size() << queryTxt;
-    for (const auto &item : artworks)
+    for(const auto &item : artworks)
     {
         REQUEST request;
         request.track = item;
@@ -102,9 +102,9 @@ inline static QUEUE artistArtworks()
         {
             qDebug() << "DONE WITH " << request.track ;
 
-            for (const auto &res : responses)
+            for(const auto &res : responses)
             {
-                if (res.context == PULPO::CONTEXT::IMAGE && !res.value.toString().isEmpty())
+                if(res.context == PULPO::CONTEXT::IMAGE && !res.value.toString().isEmpty())
                 {
                     qDebug()<<"SAVING ARTWORK FOR: " << request.track[FMH::MODEL_KEY::ARTIST];
                     auto downloader = new FMH::Downloader;
@@ -142,19 +142,19 @@ inline static QUEUE albumArtworks()
     auto ontology = PULPO::ONTOLOGY::ALBUM;
 
     const auto queryTxt = QString("SELECT %1, %2 FROM %3 WHERE %4 = ''").arg(KEYMAP[KEY::ALBUM],
-                          KEYMAP[KEY::ARTIST], TABLEMAP[TABLE::ALBUMS], KEYMAP[KEY::ARTWORK]);
+            KEYMAP[KEY::ARTIST], TABLEMAP[TABLE::ALBUMS], KEYMAP[KEY::ARTWORK]);
 
     auto db = CollectionDB::getInstance();
     /* BEFORE FETCHING ONLINE LOOK UP IN THE CACHE FOR THE IMAGES*/
     auto artworks = db->getDBData(queryTxt);
-    for (auto album : artworks)
-        if (BAE::artworkCache(album, FMH::MODEL_KEY::ALBUM))
+    for(auto album : artworks)
+        if(BAE::artworkCache(album, FMH::MODEL_KEY::ALBUM))
             db->insertArtwork(album);
 
     artworks = db->getDBData(queryTxt);
     qDebug() << "Getting missing albums artworks"<< artworks.length();
 
-    for (const auto &item : artworks)
+    for(const auto &item : artworks)
     {
         REQUEST request;
         request.track = item;
@@ -165,9 +165,9 @@ inline static QUEUE albumArtworks()
         {
             qDebug() << "DONE WITH " << request.track ;
 
-            for (const auto &res : responses)
+            for(const auto &res : responses)
             {
-                if (res.context == PULPO::CONTEXT::IMAGE && !res.value.toString().isEmpty())
+                if(res.context == PULPO::CONTEXT::IMAGE && !res.value.toString().isEmpty())
                 {
                     qDebug()<<"SAVING ARTWORK FOR: " << request.track[FMH::MODEL_KEY::ALBUM];
                     auto downloader = new FMH::Downloader;
@@ -208,7 +208,7 @@ typedef QList<PACKAGE> PACKAGES;
 
 inline void synapse(const BRAIN::PACKAGES &packages)
 {
-    if (packages.isEmpty())
+    if(packages.isEmpty())
         return;
 
     Pulpo pulpo;
@@ -217,90 +217,90 @@ inline void synapse(const BRAIN::PACKAGES &packages)
 
     auto func = [&](QUEUE &m_requests, std::function<void(int index)> cb = nullptr)
     {
-        while (m_requests.hasNext())
+        while(m_requests.hasNext())
         {
             pulpo.request(m_requests.next());
-            if (cb)
+            if(cb)
                 cb(m_requests.currentIndex());
             loop.exec();
         }
     };
 
-    for (const auto &package : packages)
+    for(const auto &package : packages)
     {
-        switch (package.ontology)
+        switch(package.ontology)
         {
-        case PULPO::ONTOLOGY::ALBUM :
-        {
-            switch (package.info)
+            case PULPO::ONTOLOGY::ALBUM :
             {
-            case PULPO::INFO::ARTWORK:
-            {
-                QUEUE request = BRAIN::albumArtworks();
-                func(request, package.callback);
-                break;
-            }
+                switch(package.info)
+                {
+                    case PULPO::INFO::ARTWORK:
+                    {
+                        QUEUE request = BRAIN::albumArtworks();
+                        func(request, package.callback);
+                        break;
+                    }
 
-            case PULPO::INFO::TAGS:
-            {
-                break;
-            }
+                    case PULPO::INFO::TAGS:
+                    {
+                        break;
+                    }
 
-            case PULPO::INFO::WIKI:
-            {
-                break;
-            }
-            }
-
-            break;
-        }
-
-        case PULPO::ONTOLOGY::ARTIST :
-        {
-            switch (package.info)
-            {
-            case PULPO::INFO::ARTWORK:
-            {
-                QUEUE request = BRAIN::artistArtworks();
-                func(request, package.callback);
-                break;
-            }
-
-            case PULPO::INFO::TAGS:
-            {
-                break;
-            }
-
-            case PULPO::INFO::WIKI:
-            {
-                break;
-            }
-            }
-            break;
-        }
-
-        case PULPO::ONTOLOGY::TRACK :
-        {
-            switch (package.info)
-            {
-            case PULPO::INFO::ARTWORK:
-            {
+                    case PULPO::INFO::WIKI:
+                    {
+                        break;
+                    }
+                }
 
                 break;
             }
 
-            case PULPO::INFO::TAGS:
+            case PULPO::ONTOLOGY::ARTIST :
             {
+                switch(package.info)
+                {
+                    case PULPO::INFO::ARTWORK:
+                    {
+                        QUEUE request = BRAIN::artistArtworks();
+                        func(request, package.callback);
+                        break;
+                    }
+
+                    case PULPO::INFO::TAGS:
+                    {
+                        break;
+                    }
+
+                    case PULPO::INFO::WIKI:
+                    {
+                        break;
+                    }
+                }
                 break;
             }
 
-            case PULPO::INFO::WIKI:
+            case PULPO::ONTOLOGY::TRACK :
             {
+                switch(package.info)
+                {
+                    case PULPO::INFO::ARTWORK:
+                    {
+
+                        break;
+                    }
+
+                    case PULPO::INFO::TAGS:
+                    {
+                        break;
+                    }
+
+                    case PULPO::INFO::WIKI:
+                    {
+                        break;
+                    }
+                }
                 break;
             }
-            }
-            break;
-        }
         }
     }
 }
