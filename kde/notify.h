@@ -25,7 +25,7 @@ public:
     void notify(const QString &title, const QString &body);
 
 private:
-    FMH::MODEL track;
+  FMH::MODEL track;
 
 signals:
     void babeSong();

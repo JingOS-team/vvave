@@ -8,7 +8,7 @@ class NextMusic : public AbstractMusicProvider
 {
     Q_OBJECT
 public:
-    explicit NextMusic(QObject *parent = nullptr);
+    explicit NextMusic(QObject *parent = nullptr);    
     QVariantList getAlbumsList() const override final;
     QVariantList getArtistsList() const override final;
 

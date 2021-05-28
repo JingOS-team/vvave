@@ -1,19 +1,3 @@
-/*
-   Babe - tiny music player
-   Copyright 2021 Wang Rui <wangrui@jingos.com>
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-   */
-
 #include "cloud.h"
 #include "abstractmusicprovider.h"
 #include "NextCloud/nextmusic.h"
@@ -60,7 +44,7 @@ void Cloud::componentComplete()
 
 void Cloud::setSortBy(const Cloud::SORTBY &sort)
 {
-    if (this->sort == sort)
+    if(this->sort == sort)
         return;
 
     this->sort = sort;
@@ -86,6 +70,10 @@ QVariantList Cloud::getArtists() const
     return this->provider->getArtistsList();
 }
 
+// FMH::MODEL_LIST Cloud::items() const
+// {
+//     return this->list;
+// }
 
 void Cloud::setList()
 {
@@ -94,60 +82,60 @@ void Cloud::setList()
 
 void Cloud::sortList()
 {
-    if (this->sort == Cloud::SORTBY::NONE)
+    if(this->sort == Cloud::SORTBY::NONE)
         return;
 
     const auto key = static_cast<FMH::MODEL_KEY>(this->sort);
     std::sort(this->list.begin(), this->list.end(), [key](const FMH::MODEL &e1, const FMH::MODEL &e2) -> bool
     {
-        switch (key)
+        switch(key)
         {
-        case FMH::MODEL_KEY::RELEASEDATE:
-        case FMH::MODEL_KEY::RATE:
-        case FMH::MODEL_KEY::FAV:
-        case FMH::MODEL_KEY::COUNT:
-        {
-            if (e1[key].toInt() > e2[key].toInt())
-                return true;
-            break;
-        }
+            case FMH::MODEL_KEY::RELEASEDATE:
+            case FMH::MODEL_KEY::RATE:
+            case FMH::MODEL_KEY::FAV:
+            case FMH::MODEL_KEY::COUNT:
+            {
+                if(e1[key].toInt() > e2[key].toInt())
+                    return true;
+                break;
+            }
 
-        case FMH::MODEL_KEY::TRACK:
-        {
-            if (e1[key].toInt() < e2[key].toInt())
-                return true;
-            break;
-        }
+            case FMH::MODEL_KEY::TRACK:
+            {
+                if(e1[key].toInt() < e2[key].toInt())
+                    return true;
+                break;
+            }
 
-        case FMH::MODEL_KEY::ADDDATE:
-        {
-            auto currentTime = QDateTime::currentDateTime();
+            case FMH::MODEL_KEY::ADDDATE:
+            {
+                auto currentTime = QDateTime::currentDateTime();
 
-            auto date1 = QDateTime::fromString(e1[key], Qt::TextDate);
-            auto date2 = QDateTime::fromString(e2[key], Qt::TextDate);
+                auto date1 = QDateTime::fromString(e1[key], Qt::TextDate);
+                auto date2 = QDateTime::fromString(e2[key], Qt::TextDate);
 
-            if (date1.secsTo(currentTime) <  date2.secsTo(currentTime))
-                return true;
+                if(date1.secsTo(currentTime) <  date2.secsTo(currentTime))
+                    return true;
 
-            break;
-        }
+                break;
+            }
 
-        case FMH::MODEL_KEY::TITLE:
-        case FMH::MODEL_KEY::ARTIST:
-        case FMH::MODEL_KEY::ALBUM:
-        case FMH::MODEL_KEY::FORMAT:
-        {
-            const auto str1 = QString(e1[key]).toLower();
-            const auto str2 = QString(e2[key]).toLower();
+            case FMH::MODEL_KEY::TITLE:
+            case FMH::MODEL_KEY::ARTIST:
+            case FMH::MODEL_KEY::ALBUM:
+            case FMH::MODEL_KEY::FORMAT:
+            {
+                const auto str1 = QString(e1[key]).toLower();
+                const auto str2 = QString(e2[key]).toLower();
 
-            if (str1 < str2)
-                return true;
-            break;
-        }
+                if(str1 < str2)
+                    return true;
+                break;
+            }
 
-        default:
-            if (e1[key] < e2[key])
-                return true;
+            default:
+                if(e1[key] < e2[key])
+                    return true;
         }
 
         return false;
@@ -156,13 +144,13 @@ void Cloud::sortList()
 
 QVariantMap Cloud::get(const int &index) const
 {
-    if (index >= this->list.size() || index < 0)
+    if(index >= this->list.size() || index < 0)
         return QVariantMap();
 
     QVariantMap res;
     const auto item = this->list.at(this->mappedIndex(index));
 
-    for (auto key : item.keys())
+    for(auto key : item.keys())
         res.insert(FMH::MODEL_NAME[key], item[key]);
 
     return res;
@@ -185,7 +173,7 @@ void Cloud::getFileUrl(const QString &id)
 
 void Cloud::getFileUrl(const int &index)
 {
-    if (index >= this->list.size() || index < 0)
+    if(index >= this->list.size() || index < 0)
         return;
 
     this->getFileUrl(this->list.at(this->mappedIndex(index))[FMH::MODEL_KEY::ID]);

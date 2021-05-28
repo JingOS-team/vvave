@@ -1,5 +1,4 @@
-// Copyright 2021 Wang Rui <wangrui@jingos.com>
-// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright 2020 Wang Rui <wangrui@jingos.com>
 
 #ifndef VIDEOSMODEL_H
 #define VIDEOSMODEL_H
@@ -38,13 +37,13 @@ public:
         COUNT = FMH::MODEL_KEY::COUNT,
         NONE
 
-    };
-    Q_ENUM(SORTBY)
+    }; Q_ENUM(SORTBY)
 
     explicit VideosModel(QObject *parent = nullptr);
 
     void componentComplete() override final;
 
+    // FMH::MODEL_LIST items() const override;
     const FMH::MODEL_LIST &items() const override;
 
     void setQuery(const QString &query);
@@ -53,7 +52,7 @@ public:
     void setSortBy(const VideosModel::SORTBY &sort);
     VideosModel::SORTBY getSortBy() const;
 
-    QStringList harunaArguments;
+    QStringList harunaArguments;//用于传参数
 
 private:
     CollectionDB *db;

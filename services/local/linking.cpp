@@ -8,7 +8,7 @@
 
 QString Linking::stringify(const QVariantMap &map)
 {
-    if (map.isEmpty()) return "{}";
+    if(map.isEmpty()) return "{}";
     auto jsonResponse = QJsonDocument::fromVariant(map);
     QString JSON(jsonResponse.toJson(QJsonDocument::Compact));
 
@@ -49,7 +49,7 @@ Linking::Linking(QObject *parent) : QObject(parent)
     {
         emit this->bytesFrame(frame);
 
-        if (isLastFrame)
+        if(isLastFrame)
         {
             emit this->arrayReady(trackArray);
         }
@@ -84,7 +84,7 @@ QString Linking::deviceIp()
 {
     auto ipList = this->checkAddresses();
 
-    if (ipList.isEmpty()) return "No IP";
+    if(ipList.isEmpty()) return "No IP";
 
     return ipList.first();
 }
@@ -137,9 +137,9 @@ QStringList Linking::checkAddresses()
     QList<QHostAddress> list = QNetworkInterface::allAddresses();
 
     QStringList res;
-    for (int nIter=0; nIter<list.count(); nIter++)
+    for(int nIter=0; nIter<list.count(); nIter++)
     {
-        if (!list[nIter].isLoopback())
+        if(!list[nIter].isLoopback())
             if (list[nIter].protocol() == QAbstractSocket::IPv4Protocol )
                 res << list[nIter].toString();
 
@@ -151,7 +151,7 @@ QStringList Linking::checkAddresses()
 void Linking::connectTo(QString ip, QString port)
 {
     this->IP = ip;
-    if (this->IP.isEmpty()) return;
+    if(this->IP.isEmpty()) return;
 
     auto url = QUrl(QString("ws://"+this->IP+":"+port));
     client.open(url);

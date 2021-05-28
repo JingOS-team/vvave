@@ -52,9 +52,9 @@ Maui.Page
         ToolButton
         {
             icon.name: "item-select"
-            onClicked: selectionMode = !selectionMode
+            //onClicked: selectionMode = !selectionMode
             checkable: false
-            checked: selectionMode
+            //checked: selectionMode
         },
 
         Maui.ToolButtonMenu

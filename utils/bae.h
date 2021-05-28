@@ -1,18 +1,4 @@
-/*
-   Babe - tiny music player
-   Copyright 2021 Wang Rui <wangrui@jingos.com>
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-   */
+// Copyright 2020 Wang Rui <wangrui@jingos.com>
 
 #ifndef BAE_H
 #define BAE_H
@@ -238,14 +224,14 @@ const static inline QString getNameFromLocation(const QString &str)
     QString ret;
     int index = 0;
 
-    for (int i = str.size() - 1; i >= 0; i--)
-        if (str[i] == '/')
+    for(int i = str.size() - 1; i >= 0; i--)
+        if(str[i] == '/')
         {
             index = i + 1;
             i = -1;
         }
 
-    for (; index < str.size(); index++)
+    for(; index < str.size(); index++)
         ret.push_back(str[index]);
 
     return ret;
@@ -286,14 +272,14 @@ const static QStringList defaultSources = QStringList() << BAE::HomePath;// é»˜è
 const static inline QString fixTitle(const QString &title,const QString &s,const QString &e)
 {
     QString newTitle;
-    for (int i=0; i<title.size(); i++)
-        if (title.at(i)==s)
+    for(int i=0; i<title.size();i++)
+        if(title.at(i)==s)
         {
-            while (title.at(i)!=e)
-                if (i==title.size()-1) break;
+            while(title.at(i)!=e)
+                if(i==title.size()-1) break;
                 else i++;
 
-        } else newTitle+=title.at(i);
+        }else newTitle+=title.at(i);
 
     return newTitle.simplified();
 }
@@ -316,11 +302,11 @@ const static inline QString ucfirst(const QString &str)/*uppercase first letter*
     QStringList result;
     QString output;
 
-    if (str.contains(" "))
+    if(str.contains(" "))
     {
         tokens = str.split(" ");
 
-        for (auto str : tokens)
+        for(auto str : tokens)
         {
             str = str.toLower();
             str[0] = str[0].toUpper();
@@ -328,7 +314,7 @@ const static inline QString ucfirst(const QString &str)/*uppercase first letter*
         }
 
         output = result.join(" ");
-    } else output = str;
+    }else output = str;
 
     return output.simplified();
 }
@@ -356,16 +342,16 @@ const static inline QString fixString (const QString &str)
     return ucfirst(title).simplified();
 }
 
-static inline bool fileExists(const QString &url)
+ static inline bool fileExists(const QString &url)
 {
     return FMH::fileExists(QUrl::fromLocalFile(url));
 }
 
-static inline BAE::TABLE albumType(const FMH::MODEL &albumMap)
+ static inline BAE::TABLE albumType(const FMH::MODEL &albumMap)
 {
-    if (albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
+    if(albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
         return BAE::TABLE::ARTISTS;
-    else if (!albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
+    else if(!albumMap[FMH::MODEL_KEY::ALBUM].isEmpty() && !albumMap[FMH::MODEL_KEY::ARTIST].isEmpty())
         return BAE::TABLE::ALBUMS;
 
     return BAE::TABLE::NONE;
@@ -373,7 +359,7 @@ static inline BAE::TABLE albumType(const FMH::MODEL &albumMap)
 
 static inline void saveArt(FMH::MODEL &track, const QByteArray &array, const QString &path)
 {
-    if (!array.isNull()&&!array.isEmpty())
+    if(!array.isNull()&&!array.isEmpty())
     {
         QImage img;
         img.loadFromData(array);
@@ -385,7 +371,7 @@ static inline void saveArt(FMH::MODEL &track, const QByteArray &array, const QSt
         if (img.save(path + name + ".png", format.toLatin1(), 100))
             track.insert(FMH::MODEL_KEY::ARTWORK,path + name + ".png");
         else  qDebug() << "couldn't save artwork";
-    } else qDebug()<<"array is empty";
+    }else qDebug()<<"array is empty";
 }
 
 static inline void saveSettings(const QString &key, const QVariant &value, const QString &group)
@@ -414,10 +400,10 @@ static inline bool artworkCache(FMH::MODEL &track, const FMH::MODEL_KEY &type = 
     {
         const auto file = QUrl::fromLocalFile(it.next());
         const auto fileName = QFileInfo(file.toLocalFile()).baseName();
-        switch (type)
+        switch(type)
         {
         case FMH::MODEL_KEY::ALBUM:
-            if (fileName == (track[FMH::MODEL_KEY::ARTIST]+"_"+track[FMH::MODEL_KEY::ALBUM]))
+            if(fileName == (track[FMH::MODEL_KEY::ARTIST]+"_"+track[FMH::MODEL_KEY::ALBUM]))
             {
                 track.insert(FMH::MODEL_KEY::ARTWORK, file.toString());
                 return true;
@@ -425,13 +411,13 @@ static inline bool artworkCache(FMH::MODEL &track, const FMH::MODEL_KEY &type = 
             break;
 
         case FMH::MODEL_KEY::ARTIST:
-            if (fileName == (track[FMH::MODEL_KEY::ARTIST]))
+            if(fileName == (track[FMH::MODEL_KEY::ARTIST]))
             {
                 track.insert(FMH::MODEL_KEY::ARTWORK, file.toString());
                 return true;
             }
             break;
-        default:
+        default: 
             break;
         }
     }

@@ -3,7 +3,7 @@
  * Cantata
  *
  * Copyright (c) 2011-2016 Craig Drummond <craig.p.drummond@gmail.com>
- * Copyright 2021 Wang Rui <wangrui@jingos.com> 
+ *
  * ----
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,10 +20,7 @@
  * along with this program; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
- *
- * 
  */
-
 #ifndef MPRIS2_H
 #define MPRIS2_H
 
@@ -73,120 +70,62 @@ public:
     virtual ~Mpris();
 
     // org.mpris.MediaPlayer2.Player
-    void Next() {
-        qDebug()<<"next";
-    }
-    void Previous() {
-        qDebug()<<"previous";
-    }
+    void Next() { qDebug()<<"next"; }
+    void Previous() {  qDebug()<<"previous"; }
     void Pause();
-    void PlayPause() {
-        qDebug()<<"pause";
-    }
-    void Stop() {
-        qDebug()<<"stop";
-    }
-    void StopAfterCurrent() {
-        qDebug()<<"stop after current";
-    }
+    void PlayPause() {  qDebug()<<"pause"; }
+    void Stop() {  qDebug()<<"stop"; }
+    void StopAfterCurrent() {  qDebug()<<"stop after current"; }
     void Play();
-    void Seek(qlonglong pos) {
-        qDebug()<<pos;
-    }
-    void SetPosition(const QDBusObjectPath &, qlonglong pos) {
-        qDebug()<<pos;
-    }
+    void Seek(qlonglong pos) {  qDebug()<<pos; }
+    void SetPosition(const QDBusObjectPath &, qlonglong pos) { qDebug()<<pos; }
     void OpenUri(const QString &) { }
     QString PlaybackStatus() const;
-    QString LoopStatus() {
-        return "sthm";
-    }
-    void SetLoopStatus(const QString &s) {
-        emit setRepeat(QLatin1String("None")!=s);
-    }
+    QString LoopStatus() { return "sthm"; }
+    void SetLoopStatus(const QString &s) { emit setRepeat(QLatin1String("None")!=s); }
     QVariantMap Metadata() const;
-    int Rate() const {
-        return 1.0;
-    }
+    int Rate() const { return 1.0; }
     void SetRate(double) { }
-    bool Shuffle() {
-        return false;
-    }
-    void SetShuffle(bool s) {
-        emit setRandom(s);
-    }
-    double Volume() const {
-        return 100.0;
-    }
-    void SetVolume(double v) {
-        emit setVolume(v*100);
-    }
+    bool Shuffle() { return false; }
+    void SetShuffle(bool s) { emit setRandom(s); }
+    double Volume() const { return 100.0; }
+    void SetVolume(double v) { emit setVolume(v*100); }
     qlonglong Position() const;
-    double MinimumRate() const {
-        return 1.0;
-    }
-    double MaximumRate() const {
-        return 1.0;
-    }
-    bool CanControl() const {
-        return true;
-    }
-    bool CanPlay() const {
-        return true;
-    }
-    bool CanPause() const {
-        return true;
-    }
-    bool CanSeek() const {
-        return true;
-    }
-    bool CanGoNext() const {
-        return true;
-    }
-    bool CanGoPrevious() const {
-        return true;
-    }
+    double MinimumRate() const { return 1.0; }
+    double MaximumRate() const { return 1.0; }
+    bool CanControl() const { return true; }
+    bool CanPlay() const { return true; }
+    bool CanPause() const { return true; }
+    bool CanSeek() const { return true; }
+    bool CanGoNext() const { return true; }
+    bool CanGoPrevious() const { return true; }
 
     // org.mpris.MediaPlayer2
-    bool CanQuit() const {
-        return true;
-    }
-    bool CanRaise() const {
-        return true;
-    }
-    bool HasTrackList() const {
-        return false;
-    }
-    QString Identity() const {
-        return QLatin1String("Cantata");
-    }
+    bool CanQuit() const { return true; }
+    bool CanRaise() const { return true; }
+    bool HasTrackList() const { return false; }
+    QString Identity() const { return QLatin1String("Cantata"); }
     QString DesktopEntry() const {
-#ifdef ENABLE_KDE_SUPPORT
+        #ifdef ENABLE_KDE_SUPPORT
         // Desktop file is installed in $prefix/share/applications/kde4/
         // rather than in $prefix/share/applications. The standard way to
         // represent this dir is with a "kde4-" prefix. See:
         // http://standards.freedesktop.org/menu-spec/1.0/go01.html#term-desktop-file-id
         return QLatin1String("kde4-cantata");
-#else
+        #else
         return QLatin1String("cantata");
-#endif
+        #endif
     }
 
-    QStringList SupportedUriSchemes() const {
-        return QStringList();
-    }
-    QStringList SupportedMimeTypes() const {
-        return QStringList();
-    }
+    QStringList SupportedUriSchemes() const { return QStringList(); }
+    QStringList SupportedMimeTypes() const { return QStringList(); }
 
 public:
     void updateCurrentSong();
 
 public Q_SLOTS:
     void Raise();
-    void Quit() {
-        QApplication::quit();
-    }
+    void Quit() { QApplication::quit(); }
 
 Q_SIGNALS:
     // org.mpris.MediaPlayer2.Player

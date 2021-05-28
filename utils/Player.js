@@ -8,6 +8,8 @@ function playTrack(index)
         currentTrackIndex = index
         mainPlaylist.listView.currentIndex = currentTrackIndex
 
+
+        // currentTrack = mainPlaylist.listView.itemAtIndex(currentTrackIndex)//如果用这个方法 那么当size>30的时候 播放第一个 再次点击播放第一个 就会currentTrack为null 而且唯独第一个不行 其他的都ok 不知道为什么
         currentTrack = mainPlaylist.listModel.get(currentTrackIndex)//这个方法ok
 
         if(typeof(currentTrack) === "undefined") return
@@ -21,7 +23,7 @@ function playTrack(index)
         player.url = currentTrack.url;
         player.playing = true
 
-        mainPlaylist.listModel.list.countUp(currentTrackIndex, true)
+        mainPlaylist.listModel.list.countUp(currentTrackIndex, true)//add by hjy  用mostPlayedTracks当做最近的播放
     }
 }
 
@@ -65,13 +67,13 @@ function nextTrack(onFinish)
     if(!mainlistEmpty)
     {
         var next = 0
-        if(playType === 0)
+        if(playType === 0)//顺序播放
         {
             next = currentTrackIndex+1 >= mainPlaylist.listView.count? 0 : currentTrackIndex+1
-        }else if(playType === 1)
+        }else if(playType === 1)//随机播放
         {
             next = shuffle()
-        }else if(playType === 2)
+        }else if(playType === 2)//单曲循环
         {
             if(onFinish)
             {
@@ -99,9 +101,17 @@ function previousTrack()
 {
     if(!mainlistEmpty)
     {
-        const previous = currentTrackIndex-1 >= 0 ? mainPlaylist.listView.currentIndex-1 : mainPlaylist.listView.count-1
-        prevTrackIndex = currentTrackIndex
-        playAt(previous)
+        if(playType === 1)//随机播放
+        {
+           var pre = shuffle()
+           prevTrackIndex = currentTrackIndex
+           playAt(pre)
+        }else
+        {
+            const previous = currentTrackIndex-1 >= 0 ? mainPlaylist.listView.currentIndex-1 : mainPlaylist.listView.count-1
+            prevTrackIndex = currentTrackIndex
+            playAt(previous)
+        }
     }
 }
 
@@ -139,7 +149,7 @@ function justRefreshPlayerUI(index)
         }
 
         player.url = currentTrack.url;
-        mainPlaylist.listModel.list.countUp(currentTrackIndex, true)
+        mainPlaylist.listModel.list.countUp(currentTrackIndex, true)//add by hjy  用mostPlayedTracks当做最近的播放
     }
 }
 
@@ -165,6 +175,7 @@ function appendTrack(track)
     if(track)
     {
         mainPlaylist.listModel.list.append(track)
+        // mainPlaylist.list.append(track)
         if(sync === true)
         {
            playlistsList.addTrack(syncPlaylist, [track.url])

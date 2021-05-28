@@ -37,13 +37,13 @@ void Pulpo::request(const PULPO::REQUEST &request)
 {
     this->req = request;
 
-    if (this->req.track.isEmpty())
+    if(this->req.track.isEmpty())
     {
         emit this->error();
         return;
     }
 
-    if (this->req.services.isEmpty())
+    if(this->req.services.isEmpty())
     {
         qWarning()<< "Please register at least one Pulpo Service";
         emit this->error();
@@ -56,7 +56,7 @@ void Pulpo::request(const PULPO::REQUEST &request)
 
 void Pulpo::start()
 {
-    for (const auto &service : this->req.services)
+    for(const auto &service : this->req.services)
         switch (service)
         {
         case SERVICES::LastFm:
@@ -71,14 +71,13 @@ void Pulpo::start()
             break;
         }
 
-        default:
-            continue;
+            default: continue;
         }
 }
 
 void Pulpo::passSignal(const REQUEST &request, const RESPONSES &responses)
 {
-    if (request.callback)
+    if(request.callback)
         request.callback(request, responses);
     else
         emit this->infoReady(request, responses);

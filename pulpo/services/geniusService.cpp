@@ -21,7 +21,7 @@ bool genius::setUpService(const PULPO::ONTOLOGY &ontology, const PULPO::INFO &in
     this->ontology = ontology;
     this->info = info;
 
-    if (!this->availableInfo[this->ontology].contains(this->info))
+    if(!this->availableInfo[this->ontology].contains(this->info))
         return false;
 
     auto url = this->API;
@@ -32,25 +32,24 @@ bool genius::setUpService(const PULPO::ONTOLOGY &ontology, const PULPO::INFO &in
     QUrl encodedTrack(this->track[FMH::MODEL_KEY::TITLE]);
     encodedTrack.toEncoded(QUrl::FullyEncoded);
 
-    switch (this->ontology)
+    switch(this->ontology)
     {
-    case PULPO::ONTOLOGY::ARTIST:
-    {
-        url.append("/search?q=");
-        url.append(encodedArtist.toString());
-        break;
-    }
+        case PULPO::ONTOLOGY::ARTIST:
+        {
+            url.append("/search?q=");
+            url.append(encodedArtist.toString());
+            break;
+        }
 
-    case PULPO::ONTOLOGY::TRACK:
-    {
-        url.append("/search?q=");
-        url.append(encodedTrack.toString());
-        url.append(" " + encodedArtist.toString());
-        break;
-    }
+        case PULPO::ONTOLOGY::TRACK:
+        {
+            url.append("/search?q=");
+            url.append(encodedTrack.toString());
+            url.append(" " + encodedArtist.toString());
+            break;
+        }
 
-    default:
-        return false;
+        default: return false;
     }
 
     qDebug()<< "[genius service]: "<< url;
@@ -82,23 +81,22 @@ QString genius::getID(const QString &url)
     auto data = mainJsonObject.toVariantMap();
     auto hits = data.value("response").toMap().value("hits").toList();
 
-    if (hits.isEmpty()) return id;
+    if(hits.isEmpty()) return id;
 
-    switch (this->ontology)
+    switch(this->ontology)
     {
 
-    case ONTOLOGY::ARTIST:
-    {
-        id = hits.first().toMap().value("result").toMap().value("primary_artist").toMap().value("api_path").toString();
-        break;
-    }
-    case ONTOLOGY::TRACK:
-    {
-        id = hits.first().toMap().value("result").toMap().value("api_path").toString();
-        break;
-    }
-    default:
-        break;
+        case ONTOLOGY::ARTIST:
+        {
+            id = hits.first().toMap().value("result").toMap().value("primary_artist").toMap().value("api_path").toString();
+            break;
+        }
+        case ONTOLOGY::TRACK:
+        {
+            id = hits.first().toMap().value("result").toMap().value("api_path").toString();
+            break;
+        }
+        default: break;
     }
 
     return !id.isEmpty()? this->API+id :  id;
@@ -123,11 +121,11 @@ bool genius::parseArtist()
     auto itemMap = data.value("response").toMap().value("artist").toMap();
     qDebug()<<"parsing artist info2";
 
-    if (itemMap.isEmpty()) return false;
+    if(itemMap.isEmpty()) return false;
     VALUE contexts;
     qDebug()<<"parsing artist info3";
 
-    if (this->info == INFO::TAGS || this->info == INFO::ALL)
+    if(this->info == INFO::TAGS || this->info == INFO::ALL)
     {
         auto alias = itemMap.value("alternate_names").toStringList();
         contexts.insert(CONTEXT::ARTIST_ALIAS, alias);
@@ -137,29 +135,29 @@ bool genius::parseArtist()
 
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::ARTIST, INFO::TAGS, contexts));
 
-        if (this->info == INFO::TAGS ) return true;
+        if(this->info == INFO::TAGS ) return true;
     }
 
-    if (this->info == INFO::WIKI || this->info == INFO::WIKI)
+    if(this->info == INFO::WIKI || this->info == INFO::WIKI)
     {
         QString wikiData;
-        for (auto wiki : itemMap.value("description").toMap().value("dom").toMap().value("children").toList())
+        for(auto wiki : itemMap.value("description").toMap().value("dom").toMap().value("children").toList())
         {
-            for (auto child : wiki.toMap().value("children").toStringList() )
+            for(auto child : wiki.toMap().value("children").toStringList() )
                 wikiData = wikiData + child;
         }
 
         contexts.insert( CONTEXT::WIKI, wikiData);
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::ARTIST, INFO::WIKI, contexts));
 
-        if (!wikiData.isEmpty() && this->info == INFO::WIKI) return true;
+        if(!wikiData.isEmpty() && this->info == INFO::WIKI) return true;
     }
 
-    if (this->info == INFO::ARTWORK || this->info == INFO::ALL)
+    if(this->info == INFO::ARTWORK || this->info == INFO::ALL)
     {
         auto artwork = itemMap.value("image_url").toString();
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::ARTIST, INFO::ARTWORK,CONTEXT::IMAGE,this->startConnection(artwork)));
-        if (!artwork.isEmpty() && this->info == INFO::ARTWORK ) return true;
+        if(!artwork.isEmpty() && this->info == INFO::ARTWORK ) return true;
     }
 
 
@@ -181,11 +179,11 @@ bool genius::parseTrack()
     auto data = mainJsonObject.toVariantMap();
     auto itemMap = data.value("response").toMap().value("song").toMap();
 
-    if (itemMap.isEmpty()) return false;
+    if(itemMap.isEmpty()) return false;
 
     auto albumMap = itemMap.value("album").toMap();
 
-    if (!albumMap.isEmpty())
+    if(!albumMap.isEmpty())
     {
         auto id = albumMap.value("api_path").toString();
         qDebug()<<"TRACK ALBUM"<<this->API+id;
@@ -193,59 +191,59 @@ bool genius::parseTrack()
         this->getAlbumInfo(album_array);
     }
 
-    if (this->info == INFO::TAGS || this->info == INFO::ALL)
+    if(this->info == INFO::TAGS || this->info == INFO::ALL)
     {
         VALUE contexts;
         QStringList team;
 
         auto performances = itemMap.value("custom_performances").toList();
-        for (auto performance : performances)
-            for (auto artist : performance.toMap().value("artists").toList())
+        for(auto performance : performances)
+            for(auto artist : performance.toMap().value("artists").toList())
                 team<< artist.toMap().value("name").toString();
 
         qDebug()<<this->track[FMH::MODEL_KEY::TITLE]<<"CUSTOM PERFORMANCES:"<<team;
 
-        for (auto feature : itemMap.value("featured_artists").toList())
+        for(auto feature : itemMap.value("featured_artists").toList())
             team<<feature.toMap().value("name").toString();
 
-        for (auto producer : itemMap.value("producer_artists").toList())
+        for(auto producer : itemMap.value("producer_artists").toList())
             team<<producer.toMap().value("name").toString();
 
-        for (auto producer : itemMap.value("writer_artists").toList())
+        for(auto producer : itemMap.value("writer_artists").toList())
             team<<producer.toMap().value("name").toString();
 
         contexts.insert(CONTEXT::TRACK_TEAM, team);
 
         emit this->infoReady(this->track, this->packResponse(ONTOLOGY::TRACK, INFO::TAGS, contexts));
 
-        if (this->info == INFO::TAGS) return true;
+        if(this->info == INFO::TAGS) return true;
     }
 
-    if (this->info == INFO::WIKI || this->info == INFO::ALL)
+    if(this->info == INFO::WIKI || this->info == INFO::ALL)
     {
         QString wikiData;
-        for (auto wiki : itemMap.value("description").toMap().value("dom").toMap().value("children").toList())
-            for (auto child : wiki.toMap().value("children").toStringList() )
+        for(auto wiki : itemMap.value("description").toMap().value("dom").toMap().value("children").toList())
+            for(auto child : wiki.toMap().value("children").toStringList() )
                 wikiData = wikiData + child;
 
 
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::TRACK, INFO::WIKI, CONTEXT::WIKI, wikiData));
 
-        if (!wikiData.isEmpty() && this->info == INFO::WIKI) return true;
+        if(!wikiData.isEmpty() && this->info == INFO::WIKI) return true;
         else return false;
     }
 
-    if (this->info == INFO::ARTWORK || this->info == INFO::ALL)
+    if(this->info == INFO::ARTWORK || this->info == INFO::ALL)
     {
         auto image = itemMap.value("header_image_url").toString();
 
         emit this->infoReady(this->track, this->packResponse(ONTOLOGY::TRACK, INFO::ARTWORK, CONTEXT::IMAGE,this->startConnection(image)));
 
-        if (!image.isEmpty() && this->info == INFO::ARTWORK) return true;
+        if(!image.isEmpty() && this->info == INFO::ARTWORK) return true;
         else return false;
     }
 
-    if (this->info == INFO::LYRICS || this->info == INFO::ALL)
+    if(this->info == INFO::LYRICS || this->info == INFO::ALL)
     {
         auto lyricsPath = itemMap.value("path").toString();
 
@@ -255,10 +253,10 @@ bool genius::parseTrack()
 
         bool lyrics = false;
 
-        if (!lyricsArray.isEmpty())
+        if(!lyricsArray.isEmpty())
             lyrics = this->extractLyrics(lyricsArray);
 
-        if (lyrics && this->info == INFO::LYRICS) return true;
+        if(lyrics && this->info == INFO::LYRICS) return true;
         else return false;
     }
 
@@ -281,10 +279,10 @@ bool genius::getAlbumInfo(const QByteArray &array)
     auto data = mainJsonObject.toVariantMap();
     auto itemMap = data.value("response").toMap().value("album").toMap();
 
-    if (itemMap.isEmpty()) return false;
+    if(itemMap.isEmpty()) return false;
 
 
-    if (this->info == INFO::TAGS || this->info == INFO::ALL)
+    if(this->info == INFO::TAGS || this->info == INFO::ALL)
     {
         VALUE tags;
 
@@ -295,23 +293,23 @@ bool genius::getAlbumInfo(const QByteArray &array)
         tags.insert(CONTEXT::ALBUM_STAT, views );
 
         QStringList team;
-        for (auto name : itemMap.value("song_performances").toList())
-            for (auto artist : name.toMap().value("artists").toList())
+        for(auto name : itemMap.value("song_performances").toList())
+            for(auto artist : name.toMap().value("artists").toList())
                 team<<artist.toMap().value("name").toString();
 
         tags.insert(CONTEXT::ALBUM_TEAM, team);
 
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::ALBUM, INFO::TAGS, tags));
 
-        if (this->info == INFO::TAGS ) return true;
+        if(this->info == INFO::TAGS ) return true;
     }
 
 
-    if (this->info == INFO::ARTWORK || this->info == INFO::ALL)
+    if(this->info == INFO::ARTWORK || this->info == INFO::ALL)
     {
         auto artwork = itemMap.value("cover_art_url").toString();
         emit this->infoReady(this->track,this->packResponse(ONTOLOGY::TRACK, INFO::ARTWORK, CONTEXT::IMAGE,this->startConnection(artwork)));
-        if (!artwork.isEmpty() && this->info == INFO::ARTWORK ) return true;
+        if(!artwork.isEmpty() && this->info == INFO::ARTWORK ) return true;
     }
 
     return false;
@@ -326,7 +324,7 @@ bool genius::extractLyrics(const QByteArray &array)
     auto lyricsList = parser.parseTag("div", "class=\"lyrics\"");
     //    auto lyricsList = this->queryHtml(array, "lyrics");
 
-    if (!lyricsList.isEmpty())
+    if(!lyricsList.isEmpty())
         lyrics = lyricsList.first();
     else
         return false;
@@ -335,7 +333,7 @@ bool genius::extractLyrics(const QByteArray &array)
 
     QString text;
 
-    if (!lyrics.isEmpty())
+    if(!lyrics.isEmpty())
     {
         text = "<h2 align='center' >" + this->track[FMH::MODEL_KEY::TITLE] + "</h2>";
         text += lyrics;
