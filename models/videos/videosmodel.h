@@ -1,4 +1,10 @@
-// Copyright 2020 Wang Rui <wangrui@jingos.com>
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
 
 #ifndef VIDEOSMODEL_H
 #define VIDEOSMODEL_H
@@ -43,7 +49,6 @@ public:
 
     void componentComplete() override final;
 
-    // FMH::MODEL_LIST items() const override;
     const FMH::MODEL_LIST &items() const override;
 
     void setQuery(const QString &query);
@@ -52,7 +57,7 @@ public:
     void setSortBy(const VideosModel::SORTBY &sort);
     VideosModel::SORTBY getSortBy() const;
 
-    QStringList harunaArguments;//用于传参数
+    QStringList harunaArguments;
 
 private:
     CollectionDB *db;

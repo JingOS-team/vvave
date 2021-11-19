@@ -1,8 +1,15 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #include "vvave.h"
 
 #include "db/collectionDB.h"
 #include "services/local/fileloader.h"
-#include "utils/brain.h"
 
 #if (defined (Q_OS_LINUX) && !defined (Q_OS_ANDROID))
 #include "kde/notify.h"
@@ -10,7 +17,7 @@
 
 #include <QtConcurrent>
 #include <QFuture>
-
+#include <QDebug>
 #ifdef STATIC_MAUIKIT
 #include "fm.h"
 #else
@@ -29,6 +36,30 @@ vvave::vvave(QObject *parent) : QObject(parent),
     db(CollectionDB::getInstance())
 {
 
+}
+
+bool vvave::readVideoEnd()
+{
+    return readVideoFileEnd;
+}
+
+void vvave::setReadVideoEnd(bool flag)
+{
+    if(readVideoFileEnd != flag) {
+          readVideoFileEnd = flag;
+    }
+}
+
+bool vvave::readMusicEnd()
+{
+    return readMusicFileEnd;
+}
+
+void vvave::setReadMusicEnd(bool flag)
+{
+    if(readMusicFileEnd != flag) {
+          readMusicFileEnd = flag;
+    }
 }
 
 //// PUBLIC SLOTS
@@ -60,7 +91,7 @@ QStringList vvave::moodColors()
     return BAE::MoodColors;
 }
 
-void vvave::scanDir(const QStringList &paths)//hjy 启动时候会走这个方法
+void vvave::scanDir(const QStringList &paths)
 {
     QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>;
     connect(watcher, &QFutureWatcher<uint>::finished, [&, watcher]()
@@ -87,8 +118,6 @@ void vvave::scanDir(const QStringList &paths)//hjy 启动时候会走这个方�
 void vvave::openUrls(const QStringList &urls)
 {
     if(urls.isEmpty()) return;
-
-    QVariantList data;
 
     for(const auto &url : urls)
     {

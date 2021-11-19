@@ -1,0 +1,21 @@
+vvave (1.2) focal; urgency=medium
+
+  * Format version
+
+ -- JingOS CI <jingos@jingos.com>  Fri, 19 Nov 2021 15:56:35 +0800
+
+vvave (1.2+git20180905-1) UNRELEASED; urgency=medium
+
+  * New snapshot
+
+ -- Jonah Brüchert <jbb@kaidan.im>  Wed, 05 Sep 2018 13:47:28 +0200
+
+vvave (1.2-0ubuntu1) unstable; urgency=medium
+
+  [ Clive Johnston ]
+  * Initial packaging for Ubuntu
+
+  [ Rik Mills ]
+  * Initial upstream release (1.2)
+
+ -- Clive Johnston <clivejo@kubuntu.org>  Fri, 24 Feb 2017 12:41:11 +0000

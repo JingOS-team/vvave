@@ -1,6 +1,7 @@
-/*
+﻿/*
    Babe - tiny music player
    Copyright (C) 2017  Camilo Higuita
+   Copyright (C) 2021  Yu Jiashu <yujiashu@jingos.com>
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
@@ -117,46 +118,27 @@ bool TagInfo::getCover() //const
 
     QFileInfo fileInfo(path);
     QString fileExtension = fileInfo.completeSuffix();
-    // if(fileExtension == "m4a")
-    // {
-    //     std::unique_ptr<TagLib::MP4::File> mp4File(new TagLib::MP4::File(
-    //                 QFile::encodeName(path).constData()));
-    //     if(mp4File->isOpen()) {
-	// 		TagLib::MP4::ItemListMap itemListMap = mp4File->tag()->itemListMap();
-	// 		TagLib::MP4::Item albumArtItem = itemListMap["covr"];
-	// 		TagLib::MP4::CoverArtList albumArtList = albumArtItem.toCoverArtList();
-	// 		TagLib::MP4::CoverArt albumArt = albumArtList.front();
-	// 		QImage image = QImage::fromData((const uchar *)albumArt.data().data(),
-	// 						albumArt.data().size());
-    //         image.save(this->cover_path);
-    //         return true;
-	// 	}
-    // }
-    // else 
-    if(fileExtension == "mp3")
-    {
-        std::unique_ptr<TagLib::MPEG::File> mpegFile(new TagLib::MPEG::File(
-                    QFile::encodeName(path).constData()));
-        if(mpegFile->isOpen())
-        {
+    if(fileExtension == "mp3") {
+        std::unique_ptr<TagLib::MPEG::File> mpegFile(new TagLib::MPEG::File(QFile::encodeName(path).constData()));
+        if(mpegFile->isOpen()) {
             auto tag = mpegFile->ID3v2Tag(false);
             auto list = tag->frameListMap()["APIC"];
             if(!list.isEmpty()) {
                 auto frame = list.front();
                 auto pic = reinterpret_cast<TagLib::ID3v2::AttachedPictureFrame *>(frame);
-                if(pic && !pic->picture().isNull())
-                {
-                    QImage image = QImage::fromData((const uchar *)pic->picture().data(), pic->picture().size());
-                    image.save(this->cover_path);
+                if(pic && !pic->picture().isNull()) {
+                    QImage cover;
+                    cover.loadFromData(QByteArray::fromRawData(pic->picture().data(), pic->picture().size()));
+                    cover = cover.scaled(160,160);
+                    cover.save(this->cover_path);
                     return true;
                 }
             }
-
         }
     }
 
     this->cover_path = "";
-	return false;
+    return false;
 }
 
 void TagInfo::setCover(const QByteArray &array)

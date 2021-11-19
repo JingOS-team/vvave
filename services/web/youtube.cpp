@@ -1,6 +1,7 @@
 /*
    Babe - tiny music player
    Copyright (C) 2017  Camilo Higuita
+   Copyright (C) 2021 Yu Jiashu <yujiashu@jingos.com>
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
@@ -13,7 +14,7 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
-   */
+ */
 
 
 #include "youtube.h"
@@ -50,7 +51,6 @@ bool YouTube::getQuery(const QString &query, const int &limit)
     url.append(QString("&maxResults=%1&part=snippet").arg(QString::number(limit)));
     url.append("&key="+ BAE::loadSettings("YOUTUBEKEY", "BABE", this->KEY).toString());
 
-    qDebug()<< url;
     auto array = this->startConnection(url);
 
     if(array.isEmpty()) return false;
@@ -104,8 +104,6 @@ bool YouTube::packQueryResults(const QByteArray &array)
 
         if(!id.isEmpty())
         {
-            qDebug()<<url<<artwork;
-
             QVariantMap map = {
                 {BAE::KEYMAP[BAE::KEY::ID], id},
                 {BAE::KEYMAP[BAE::KEY::URL], url},
@@ -167,7 +165,6 @@ QByteArray YouTube::startConnection(const QString &url, const QMap<QString, QStr
 
         if(reply->error())
         {
-            qDebug() << reply->error();
             return QByteArray();
         }
 

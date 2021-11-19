@@ -1,6 +1,7 @@
 /*
    Babe - tiny music player
    Copyright (C) 2017  Camilo Higuita
+   Copyright (C) 2021 Yu Jiashu <yujiashu@jingos.com>
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
@@ -17,35 +18,24 @@
 
 #include "pulpo.h"
 #include "services/lastfmService.h"
-//#include "services/spotifyService.h"
-//#include "services/lyricwikiaService.h"
-//#include "services/geniusService.h"
-//#include "services/musicbrainzService.h"
-//#include "services/deezerService.h"
-
-//#include "qgumbodocument.h"p
-//#include "qgumbonode.h"
 
 Pulpo::Pulpo(QObject *parent): QObject(parent) {}
 
 Pulpo::~Pulpo()
 {
-    qDebug()<< "DELETING PULPO INSTANCE";
+
 }
 
 void Pulpo::request(const PULPO::REQUEST &request)
 {
     this->req = request;
 
-    if(this->req.track.isEmpty())
-    {
+    if(this->req.track.isEmpty()) {
         emit this->error();
         return;
     }
 
-    if(this->req.services.isEmpty())
-    {
-        qWarning()<< "Please register at least one Pulpo Service";
+    if(this->req.services.isEmpty()) {
         emit this->error();
         return;
     }
@@ -57,20 +47,16 @@ void Pulpo::request(const PULPO::REQUEST &request)
 void Pulpo::start()
 {
     for(const auto &service : this->req.services)
-        switch (service)
-        {
-        case SERVICES::LastFm:
-        {
+        switch (service) {
+        case SERVICES::LastFm: {
             auto lastfm  = new class lastfm();
-            connect(lastfm, &lastfm::responseReady,[&, _lastfm = std::move(lastfm)](PULPO::REQUEST request, PULPO::RESPONSES responses)
-            {
+            connect(lastfm, &lastfm::responseReady,[&, _lastfm = std::move(lastfm)](PULPO::REQUEST request, PULPO::RESPONSES responses) {
                 this->passSignal(request, responses);
                 _lastfm->deleteLater();
             });
             lastfm->set(this->req);
             break;
         }
-
             default: continue;
         }
 }

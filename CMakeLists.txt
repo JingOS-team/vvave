@@ -34,12 +34,8 @@ add_executable(media
     ${hjyRec}
     main.cpp
     vvave.cpp
-#    pulpo/services/geniusService.cpp
-#    pulpo/services/deezerService.cpp
+    JAppControl.cpp
     pulpo/services/lastfmService.cpp
-#    pulpo/services/lyricwikiaService.cpp
-#    pulpo/services/spotifyService.cpp
-#    pulpo/services/musicbrainzService.cpp
     pulpo/pulpo.cpp
     pulpo/htmlparser.cpp
     pulpo/service.cpp
@@ -47,15 +43,11 @@ add_executable(media
     services/local/mediastorage.cpp
     services/local/player.cpp
     services/local/youtubedl.cpp
-#    services/local/linking.cpp
-#    services/local/socket.cpp
     services/jingos_dbus/jingosdbus.cpp
     services/web/youtube.cpp
     services/web/NextCloud/nextmusic.cpp
     services/web/abstractmusicprovider.cpp
-#    services/web/Spotify/spotify.cpp
     db/collectionDB.cpp
-#    utils/brain.cpp
     models/tracks/tracksmodel.cpp
     models/videos/videosmodel.cpp
     models/playlists/playlistsmodel.cpp
@@ -89,10 +81,12 @@ if (ANDROID)
 else()
     find_package(Taglib REQUIRED)
     target_sources(media PRIVATE
-        kde/mpris2.cpp
         kde/notify.cpp
+        kde/mpris2/mpris2.cpp
+        kde/mpris2/mediaplayer2.cpp
+        kde/mpris2/mediaplayer2player.cpp
         )
-    target_link_libraries(media Qt5::WebView KF5::ConfigCore KF5::Notifications KF5::KIOCore KF5::I18n Qt5::DBus KF5::Attica KF5::SyntaxHighlighting mediainfo)
+    target_link_libraries(media Qt5::WebView KF5::ConfigCore KF5::Notifications KF5::KIOCore KF5::I18n Qt5::DBus KF5::Attica KF5::SyntaxHighlighting mediainfo jappcoreqt)
 endif()
 
 find_package(KF5I18n CONFIG REQUIRED)

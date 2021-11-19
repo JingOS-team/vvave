@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef __HARUHA_PLAYER__
 #define __HARUHA_PLAYER__
 

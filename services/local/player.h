@@ -1,4 +1,12 @@
-﻿#ifndef PLAYER_H
+﻿/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
+#ifndef PLAYER_H
 #define PLAYER_H
 
 #include <QObject>
@@ -11,11 +19,11 @@ class Player : public QObject
     Q_OBJECT
     Q_PROPERTY(QUrl url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(int volume READ getVolume WRITE setVolume NOTIFY volumeChanged)
-    Q_PROPERTY(Player::STATE state READ getState NOTIFY stateChanged)
-    Q_PROPERTY(int duration READ getDuration NOTIFY durationChanged)
+    Q_PROPERTY(Player::STATE state READ getPlayState NOTIFY stateChanged)
+    Q_PROPERTY(double duration READ getDuration NOTIFY durationChanged)
     Q_PROPERTY(bool playing READ getPlaying WRITE setPlaying NOTIFY playingChanged)
     Q_PROPERTY(bool finished READ getFinished NOTIFY finishedChanged)
-    Q_PROPERTY(int pos READ getPos WRITE setPos NOTIFY posChanged)
+    Q_PROPERTY(double pos READ getPos WRITE setPos NOTIFY posChanged)
 
 public:
 
@@ -34,23 +42,28 @@ public:
     void setVolume(const int &value);
     int getVolume() const;
 
-    int getDuration() const;
+    double getDuration() const;
 
-    Player::STATE getState() const;
+    QMediaPlayer::State getState() const;
+    Player::STATE getPlayState() const;
 
     void setPlaying(const bool &value);
     bool getPlaying() const;
 
     bool getFinished();
 
-    int getPos() const;
-    void setPos(const int &value);
+    double getPos() const;
+    void setPos(const double &value);
+    bool play();
+    void pause();
+    Q_INVOKABLE qint64 getPlayerPos();
+
 
 private:
     QMediaPlayer *player;
     QTimer *updater;
     int amountBuffers = 0;
-    int pos = 0;
+    double pos = 0;
     int volume = 100;
 
     QUrl url;
@@ -58,8 +71,6 @@ private:
     bool playing = false;
     bool finished = false;
 
-    bool play() const;
-    void pause() const;
     void update();
 
     void emitState();

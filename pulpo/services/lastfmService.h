@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef LASTFMSERVICE_H
 #define LASTFMSERVICE_H
 
@@ -24,10 +32,6 @@ public:
 protected:
     virtual void parseArtist(const QByteArray &array) override final;
     virtual void parseAlbum(const QByteArray &array) override final;
-//    virtual void parseTrack(const QByteArray &array);
-
-
-    /*INTERNAL IMPLEMENTATION*/
 
 };
 

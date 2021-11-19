@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef HTMLPARSER_H
 #define HTMLPARSER_H
 #include <QObject>
@@ -11,7 +19,7 @@ class htmlParser : public QObject
 public:
     explicit htmlParser(QObject *parent = nullptr);
     void setHtml(const QByteArray &html);
-    QStringList parseTag(const QString &tagRef, const QString &attribute=""); // return all tag matches with content
+    QStringList parseTag(const QString &tagRef, const QString &attribute="");
     bool findTag(const QString &txt, const QString &tagRef);
     QString extractProp(const QString &tag, const QString &prop);
 

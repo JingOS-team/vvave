@@ -110,7 +110,7 @@ msgstr "无结果"
 msgid "Batch editing"
 msgstr "批量编辑"
 
-msgid "There is no video at present"
+msgid "There are no videos at present"
 msgstr "这里空空如也"
 
 

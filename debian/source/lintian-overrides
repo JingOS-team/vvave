@@ -1,0 +1,2 @@
+# we are not linking with taglib from 3rdparty folder for our code
+vvave source: license-problem-convert-utf-code 3rdparty/taglib/toolkit/unicode.cpp

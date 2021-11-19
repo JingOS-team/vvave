@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef CLOUD_H
 #define CLOUD_H
 
@@ -39,8 +47,6 @@ public:
 
     explicit Cloud(QObject *parent = nullptr);
     void componentComplete() override final;
-
-    // FMH::MODEL_LIST items() const override;
 
     void setSortBy(const Cloud::SORTBY &sort);
     Cloud::SORTBY getSortBy() const;

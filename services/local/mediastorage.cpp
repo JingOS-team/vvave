@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2017 Atul Sharma <atulsharma406@gmail.com>
  * Copyright (C) 2014  Vishesh Handa <vhanda@kde.org>
+ * Copyright (C) 2021  Yu Jiashu <yujiashu@jingos.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,7 +39,6 @@
 MediaStorage::MediaStorage(const QString &url, QObject *parent)
     : QObject(parent)
 {
-    qDebug() << "MediaStorage url == " << url;
     this->path = url;
     QFileInfo _file(this->path);
 }
@@ -54,7 +54,6 @@ void MediaStorage::getCover()
     plugins << KIO::PreviewJob::availablePlugins();
     KFileItemList list;
     list.append(KFileItem(QUrl("file://" + this->path),  QString(), 0));
-    qDebug() << "MediaStorage getCover list == " << list;
     KIO::PreviewJob *job = KIO::filePreview(list, QSize(330, 206), &plugins);
     job->setIgnoreMaximumSize(true);
     job->setScaleType(KIO::PreviewJob::ScaleType::Unscaled);
@@ -63,8 +62,5 @@ void MediaStorage::getCover()
 
 void MediaStorage::gotPreviewed(const KFileItem &item, const QPixmap &preview)
 {   
-    qDebug() << "!!!!!!!!!!!!!!!!!!!!!! MediaStorage gotPreviewed";
-    // QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + item.localPath());
-    // dir.mkpath(dir.absolutePath());
-    // preview.save(dir.absolutePath()+ "/preview.jpg", "JPG");
+
 }

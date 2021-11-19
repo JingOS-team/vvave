@@ -72,6 +72,8 @@ Item
       */
     signal cleared()
 
+    signal addAll()
+
 
 
     property QtObject m_private : QtObject
@@ -149,6 +151,22 @@ Item
             item.uri = uri
             control.uriAdded(uri)
         }
+    }
+
+    function justAppend(uri, item)
+    {
+        const index  = _private._uris.indexOf(uri)
+        if(index < 0)
+        {
+            _private._items.push(item)
+            _private._uris.push(uri)
+            item.uri = uri
+        }
+    }
+
+    function selectAllSignal()
+    {
+      control.addAll()
     }
 
     /**

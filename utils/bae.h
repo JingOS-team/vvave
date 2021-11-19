@@ -1,4 +1,10 @@
-// Copyright 2020 Wang Rui <wangrui@jingos.com>
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
 
 #ifndef BAE_H
 #define BAE_H
@@ -204,7 +210,7 @@ static const DB TracksColsMap =
     {KEY::ART, KEYMAP[KEY::ART]}
 };
 
-const static inline QString transformTime(const qint64 &value)
+const static inline QString transformTime(const int &value)
 {
     QString tStr;
     if (value)
@@ -367,11 +373,10 @@ static inline void saveArt(FMH::MODEL &track, const QByteArray &array, const QSt
         name.replace("/", "-");
         name.replace("&", "-");
         QString format = "PNG";
-        qDebug()<< "SAVER TO "<< path + name + ".png";
         if (img.save(path + name + ".png", format.toLatin1(), 100))
             track.insert(FMH::MODEL_KEY::ARTWORK,path + name + ".png");
         else  qDebug() << "couldn't save artwork";
-    }else qDebug()<<"array is empty";
+    } else qDebug()<<"array is empty";
 }
 
 static inline void saveSettings(const QString &key, const QVariant &value, const QString &group)

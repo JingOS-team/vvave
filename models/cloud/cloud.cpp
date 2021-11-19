@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #include "cloud.h"
 #include "abstractmusicprovider.h"
 #include "NextCloud/nextmusic.h"
@@ -69,11 +77,6 @@ QVariantList Cloud::getArtists() const
 {
     return this->provider->getArtistsList();
 }
-
-// FMH::MODEL_LIST Cloud::items() const
-// {
-//     return this->list;
-// }
 
 void Cloud::setList()
 {

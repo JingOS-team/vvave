@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef ENUMS_H
 #define ENUMS_H
 
@@ -133,7 +141,6 @@ enum class RECURSIVE : bool
 
 typedef QMap<CONTEXT, QVariant> VALUE;
 typedef QMap<INFO, VALUE> INFO_K;
-//    typedef QMap<ONTOLOGY, INFO_K> RESPONSE;
 
 typedef QMap<ONTOLOGY, QList<INFO>> SCOPE;
 

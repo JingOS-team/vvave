@@ -1,9 +1,16 @@
-// Copyright 2020 Wang Rui <wangrui@jingos.com>
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
 
 #ifndef TRACKSMODEL_H
 #define TRACKSMODEL_H
 
 #include <QObject>
+#include <QVariant>
 
 #ifdef STATIC_MAUIKIT
 #include "fmh.h"
@@ -13,6 +20,7 @@
 #include <MauiKit/mauilist.h>
 #endif
 
+#include <klocalizedstring.h>
 
 class CollectionDB;
 class TracksModel : public MauiList
@@ -43,7 +51,6 @@ public:
 
     void componentComplete() override final;
 
-    // FMH::MODEL_LIST items() const override;
     const FMH::MODEL_LIST &items() const override;
 
     void setQuery(const QString &query);
@@ -51,10 +58,15 @@ public:
 
     void setSortBy(const TracksModel::SORTBY &sort);
     TracksModel::SORTBY getSortBy() const;
+    QVariantMap currentTrack() const;
+    int currentIndex() const;
 
 private:
     CollectionDB *db;
     FMH::MODEL_LIST list;
+    QVariantMap m_currentTrack;
+    int m_currentIndex;
+
     void sortList();
     void setList();
 
@@ -64,11 +76,17 @@ private:
 signals:
     void queryChanged();
     void sortByChanged();
+    void currentIndexChanged(int currentIndex);
+    void currentTrackChanged(QVariantMap currentTrack);
+    void nextRequest();
+    void previousRequest();
 
 public slots:
     QVariantMap get(const int &index) const;
     QVariantList getAll();
     void append(const QVariantMap &item);
+    void justAppend(const QVariantMap &item);
+    void appendRefresh();
     void append(const QVariantMap &item, const int &at);
     void appendQuery(const QString &query);
     void searchQueries(const QStringList &queries, const int &type);
@@ -82,6 +100,7 @@ public slots:
     bool update(const QVariantMap &data, const int &index);
 
     bool deleteFile(const int &index);
+    void deleteFiles(const QList<QUrl> &urls);
     bool copyFile(const int &index, const bool &value);
 
     void emitpPlayingState(const bool &isPlay);

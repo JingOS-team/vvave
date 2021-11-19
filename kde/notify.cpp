@@ -1,6 +1,8 @@
 /*
    Babe - tiny music player
    Copyright (C) 2017  Camilo Higuita
+   Copyright (C) 2021 Yu Jiashu <yujiashu@jingos.com>
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
@@ -22,12 +24,10 @@ Notify::Notify(QObject *parent) : QObject(parent)
 
 Notify::~Notify()
 {
-    qDebug()<<"DELETING KNOTIFY";
 }
 
 void Notify::notify(const QString &title, const QString &body)
 {
-    // notification->setComponentName(QStringLiteral("Babe"));
     auto notification = new KNotification(QStringLiteral("Notify"),KNotification::CloseOnTimeout, this);
     connect(notification, &KNotification::closed, notification, &KNotification::deleteLater);
     notification->setTitle(QStringLiteral("%1").arg(title));
@@ -38,7 +38,6 @@ void Notify::notify(const QString &title, const QString &body)
 void Notify::notifySong(const FMH::MODEL &trackMap)
 {
     this->track = trackMap;
-    // notification->setComponentName(QStringLiteral("Babe"));
     auto notification = new KNotification(QStringLiteral("Notify"),KNotification::CloseOnTimeout, this);
     connect(notification, &KNotification::closed, notification, &KNotification::deleteLater);
 

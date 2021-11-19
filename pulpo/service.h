@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef SERVICE_H
 #define SERVICE_H
 
@@ -20,8 +28,8 @@ public:
     explicit Service(QObject *parent = nullptr);
 
 protected:
-    PULPO::REQUEST request; //the main request. the track info, the ontology and info type
-    PULPO::SCOPE scope; //what ontology and info can the service parse
+    PULPO::REQUEST request;
+    PULPO::SCOPE scope;
     PULPO::RESPONSES responses;
 
     void parse(const QByteArray &array);

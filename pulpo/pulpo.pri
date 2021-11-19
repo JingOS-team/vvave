@@ -5,6 +5,7 @@ CONFIG += ordered
 
 SOURCES += \
 #    $$PWD/services/deezerService.cpp \
+    $$PWD/htmlparser.cpp \
     $$PWD/services/lastfmService.cpp \
 #    $$PWD/services/spotifyService.cpp \
 #    $$PWD/services/musicbrainzService.cpp \
@@ -20,6 +21,7 @@ HEADERS += \
 #    $$PWD/services/musicbrainzService.h \
 #    $$PWD/services/deezerService.h \
 #    $$PWD/services/lyricwikiaService.h \
+    $$PWD/htmlparser.h \
     $$PWD/services/lastfmService.h \
     $$PWD/enums.h \
     $$PWD/pulpo.h \

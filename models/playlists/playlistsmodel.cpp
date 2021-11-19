@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #include "playlistsmodel.h"
 #include "db/collectionDB.h"
 
@@ -6,11 +14,6 @@ PlaylistsModel::PlaylistsModel(QObject *parent) : MauiList(parent),
 {
     this->setList();
 }
-
-// FMH::MODEL_LIST PlaylistsModel::items() const
-// {
-//     return this->list;
-// }
 
 const FMH::MODEL_LIST &PlaylistsModel::items() const
 {
@@ -39,7 +42,6 @@ PlaylistsModel::SORTBY PlaylistsModel::getSortBy() const
 void PlaylistsModel::sortList()
 {
     const auto key = static_cast<FMH::MODEL_KEY>(this->sort);
-    qDebug()<< "SORTING LIST BY"<< this->sort;
     qSort(this->list.begin() + this->defaultPlaylists().size(), this->list.end(), [key](const FMH::MODEL &e1, const FMH::MODEL &e2) -> bool
     {
         auto role = key;
@@ -93,7 +95,6 @@ FMH::MODEL PlaylistsModel::packPlaylist(const QString &playlist)
         {FMH::MODEL_KEY::PLAYLIST, playlist},
         {FMH::MODEL_KEY::TYPE, "personal"},
         {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-        //        {FMH::MODEL_KEY::ICON, "view-media-playlist"}
     };
 }
 
@@ -101,74 +102,41 @@ QVariantList PlaylistsModel::defaultPlaylists()
 {
     const  auto model = FMH::MODEL_LIST  {
     {
-    {FMH::MODEL_KEY::TYPE, "default"},
-    {FMH::MODEL_KEY::DESCRIPTION, "Favorite tracks"},
-    {FMH::MODEL_KEY::COLOR, "#EC407A"},
-    {FMH::MODEL_KEY::PLAYLIST, "Favs"},
-    {FMH::MODEL_KEY::ICON, "love"},
-    {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-},
+        {FMH::MODEL_KEY::TYPE, "default"},
+        {FMH::MODEL_KEY::DESCRIPTION, "Favorite tracks"},
+        {FMH::MODEL_KEY::COLOR, "#EC407A"},
+        {FMH::MODEL_KEY::PLAYLIST, "Favs"},
+        {FMH::MODEL_KEY::ICON, "love"},
+        {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
+    },
 
     {
-    {FMH::MODEL_KEY::TYPE, "default"},
-    {FMH::MODEL_KEY::DESCRIPTION, "Top listened tracks"},
-    {FMH::MODEL_KEY::COLOR, "#FFA000"},
-    {FMH::MODEL_KEY::PLAYLIST, "Most Played"},
-    {FMH::MODEL_KEY::ICON, "view-media-playcount"},
-    {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-},
+        {FMH::MODEL_KEY::TYPE, "default"},
+        {FMH::MODEL_KEY::DESCRIPTION, "Top listened tracks"},
+        {FMH::MODEL_KEY::COLOR, "#FFA000"},
+        {FMH::MODEL_KEY::PLAYLIST, "Most Played"},
+        {FMH::MODEL_KEY::ICON, "view-media-playcount"},
+        {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
+    },
 
     {
-    {FMH::MODEL_KEY::TYPE, "default"},
-    {FMH::MODEL_KEY::DESCRIPTION, "Highest rated tracks"},
-    {FMH::MODEL_KEY::COLOR, "#42A5F5"},
-    {FMH::MODEL_KEY::PLAYLIST, "Rating"},
-    {FMH::MODEL_KEY::ICON, "view-media-favorite"},
-    {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-},
-
-            //        {
-            //            {FMH::MODEL_KEY::TYPE, "default"},
-            //            {FMH::MODEL_KEY::PLAYLIST, "Recent"},
-            //            {FMH::MODEL_KEY::ICON, "view-media-recent"},
-            //            {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-            //        },
-
-
+        {FMH::MODEL_KEY::TYPE, "default"},
+        {FMH::MODEL_KEY::DESCRIPTION, "Highest rated tracks"},
+        {FMH::MODEL_KEY::COLOR, "#42A5F5"},
+        {FMH::MODEL_KEY::PLAYLIST, "Rating"},
+        {FMH::MODEL_KEY::ICON, "view-media-favorite"},
+        {FMH::MODEL_KEY::ADDDATE, QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
+    },
 
     {
-    {FMH::MODEL_KEY::TYPE, "default"},
-    {FMH::MODEL_KEY::COLOR, "#26A69A"},
-    {FMH::MODEL_KEY::DESCRIPTION, "Online tracks"},
-    {FMH::MODEL_KEY::PLAYLIST, "YouTube"},
-    {FMH::MODEL_KEY::ICON, "internet-services"},
-    {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-},
-
-            //        {
-            //            {FMH::MODEL_KEY::PLAYLIST, "Tags"},
-            //            {FMH::MODEL_KEY::ICON, "tag"},
-            //            {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-            //        },
-
-            //        {
-            //            {FMH::MODEL_KEY::PLAYLIST, "Relationships"},
-            //            {FMH::MODEL_KEY::ICON, "view-media-similarartists"},
-            //            {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-            //        },
-
-            //        {
-            //            {FMH::MODEL_KEY::PLAYLIST, "Popular"},
-            //            {FMH::MODEL_KEY::ICON, "view-media-chart"},
-            //            {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-            //        },
-
-            //        {
-            //            {FMH::MODEL_KEY::PLAYLIST, "Genres"},
-            //            {FMH::MODEL_KEY::ICON, "view-media-genre"},
-            //            {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
-            //        }
-};
+        {FMH::MODEL_KEY::TYPE, "default"},
+        {FMH::MODEL_KEY::COLOR, "#26A69A"},
+        {FMH::MODEL_KEY::DESCRIPTION, "Online tracks"},
+        {FMH::MODEL_KEY::PLAYLIST, "YouTube"},
+        {FMH::MODEL_KEY::ICON, "internet-services"},
+        {FMH::MODEL_KEY::ADDDATE,QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate)}
+    },
+    };
 
     return FMH::toMapList(model);
 }
@@ -259,8 +227,7 @@ void PlaylistsModel::removePlaylist(const int &index)
     if(index >= this->list.size() || index < 0)
         return;
 
-    if(this->db->removePlaylist(this->list.at(index)[FMH::MODEL_KEY::PLAYLIST]))
-    {
+    if(this->db->removePlaylist(this->list.at(index)[FMH::MODEL_KEY::PLAYLIST])) {
         emit this->preItemRemoved(index);
         this->list.removeAt(index);
         emit this->postItemRemoved();

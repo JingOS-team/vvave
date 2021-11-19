@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #ifndef PLAYLISTSMODEL_H
 #define PLAYLISTSMODEL_H
 
@@ -25,7 +33,6 @@ public:
 
     explicit PlaylistsModel(QObject *parent = nullptr);
 
-    // FMH::MODEL_LIST items() const override;
     const FMH::MODEL_LIST &items() const override;
 
     void setSortBy(const PlaylistsModel::SORTBY &sort);

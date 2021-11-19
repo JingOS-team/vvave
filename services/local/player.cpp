@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Yu Jiashu <yujiashu@jingos.com>
+ *
+ */
+
 #include "player.h"
 #include "../../utils/bae.h"
 
@@ -8,28 +16,21 @@
 #endif
 
 Player::Player(QObject *parent) : QObject(parent),
-    player(new QMediaPlayer(this)),
-    updater(new QTimer(this))
+    player(new QMediaPlayer(this))
 { 
+    updater= new QTimer(this);
     this->player->setVolume(this->volume);
     connect(this->updater, &QTimer::timeout, this, &Player::update);
 }
 
 inline QNetworkRequest getOcsRequest(const QNetworkRequest& request)
 {
-    qDebug() << Q_FUNC_INFO;
-
-    qDebug()<< "FORMING THE REQUEST" << request.url();
-
-    // Read raw headers out of the provided request
     QMap<QByteArray, QByteArray> rawHeaders;
     for (const QByteArray& headerKey : request.rawHeaderList()) {
         rawHeaders.insert(headerKey, request.rawHeader(headerKey));
     }
 
     const auto account = FMH::toModel(MauiAccounts::instance()->getCurrentAccount());
-//    const auto account = FMH::MODEL();
-
     const QString concatenated =  QString("%1:%2").arg(account[FMH::MODEL_KEY::USER], account[FMH::MODEL_KEY::PASSWORD]);
     const QByteArray data = concatenated.toLocal8Bit().toBase64();
     const QString headerData = "Basic " + data;
@@ -47,27 +48,25 @@ inline QNetworkRequest getOcsRequest(const QNetworkRequest& request)
     newRequest.setAttribute(QNetworkRequest::CacheSaveControlAttribute, true);
     newRequest.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
 
-    qDebug() << "headers" << newRequest.rawHeaderList() << newRequest.url();
-
     return newRequest;
 }
 
-bool Player::play() const
+bool Player::play()
 {
     if(this->url.isEmpty()) return false;
 
     if(!updater->isActive())
-        this->updater->start(1000);
+        this->updater->start(200);
 
     this->player->play();
-
     return true;
 }
 
-void Player::pause() const
+void Player::pause()
 {
-    if(this->player->isAvailable())
+    if(this->player->isAvailable()){
         this->player->pause();
+    }
 }
 
 void Player::stop()
@@ -147,12 +146,17 @@ int Player::getVolume() const
     return this->volume;
 }
 
-int Player::getDuration() const
+double Player::getDuration() const
 {
-    return static_cast<int>(this->player->duration());
+    return static_cast<double>(this->player->duration());
 }
 
-Player::STATE Player::getState() const
+QMediaPlayer::State Player::getState() const
+{
+    return this->player->state();
+}
+
+Player::STATE Player::getPlayState() const
 {
     return this->state;
 }
@@ -179,7 +183,7 @@ bool Player::getFinished()
     return this->finished;
 }
 
-void Player::setPos(const int &value)
+void Player::setPos(const double &value)
 {
     this->pos = value;
     this->player->setPosition(this->player->duration() / 1000 * this->pos);
@@ -187,16 +191,25 @@ void Player::setPos(const int &value)
     this->posChanged();
 }
 
-int Player::getPos() const
+double Player::getPos() const
 {
     return this->pos;
+}
+
+qint64 Player::getPlayerPos()
+{
+    return player->position();
 }
 
 void Player::update()
 {
     if(this->player->isAvailable())
     {
-        this->pos = static_cast<int>(static_cast<double>(this->player->position())/this->player->duration()*1000);
+        if(this->player->duration() == 0)
+        {
+            return;
+        }
+        this->pos = static_cast<int>(static_cast<double>(this->player->position()) / this->player->duration() * 1000);
         emit this->durationChanged();
         emit this->posChanged();
     }

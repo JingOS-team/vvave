@@ -93,10 +93,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp \
+    JAppControl.cpp \
     db/collectionDB.cpp \
+    services/jingos_dbus/jingosdbus.cpp \
     services/local/taginfo.cpp \
     services/local/mediastorage.cpp \
     services/local/player.cpp \
+    services/local/youtubedl.cpp \
     services/web/youtube.cpp \
     vvave.cpp \
     models/tracks/tracksmodel.cpp \
@@ -116,7 +119,10 @@ QML_IMPORT_PATH =
 QML_DESIGNER_IMPORT_PATH =
 
 HEADERS += \
+    JAppControl.h \
     db/collectionDB.h \
+    services/jingos_dbus/jingosdbus.h \
+    services/local/youtubedl.h \
     utils/bae.h \
     services/local/fileloader.h \
     services/local/taginfo.h \
@@ -137,3 +143,7 @@ INCLUDEPATH += \
      $$PWD/services/web/NextCloud
 
 include(install.pri)
+
+DISTFILES += \
+    utils/Help.js \
+    utils/Player.js
